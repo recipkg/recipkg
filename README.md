@@ -144,7 +144,7 @@ recipkg remove my-app@0.1.0
 
 | 技能 | 作用 |
 | --- | --- |
-| `migrate-to-recipkg` | 观察现有软件，整理完整配方与依赖 |
+| `migrate-to-recipkg` | 在现有项目中初始化 Recipkg，观察软件并整理配方与依赖 |
 | `rewrite-to-recipkg` | 观察、提取配方、建立规范仓库，再按配方重写并验收 |
 | `test-feedback` | 模拟目标用户实际走端到端路径，结合本项目和相关项目的 issue 合成需求 |
 

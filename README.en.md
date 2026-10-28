@@ -142,7 +142,7 @@ Three public skills ship with the CLI, with English entry points and `SKILL.zh-C
 
 | Skill | Purpose |
 | --- | --- |
-| `migrate-to-recipkg` | Observe software and extract a complete recursive recipe |
+| `migrate-to-recipkg` | Initialize Recipkg in an existing project and extract a complete recursive recipe |
 | `rewrite-to-recipkg` | Observe, specify, establish a recipe repository, rebuild, and verify |
 | `test-feedback` | Run target-user end-to-end tasks and synthesize requirements from real tests and related issues |
 
