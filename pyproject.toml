@@ -24,8 +24,8 @@ dependencies = []
 recipkg = "recipkg.cli:main"
 
 [project.urls]
-Repository = "https://github.com/LIghtJUNction/recipkg"
-Specification = "https://github.com/LIghtJUNction/recipkg/blob/main/docs/SPEC.md"
+Repository = "https://github.com/recipkg/recipkg"
+Specification = "https://github.com/recipkg/recipkg/blob/main/docs/SPEC.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

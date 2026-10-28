@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Recipkg logo">
+  <rect width="512" height="512" rx="112" fill="#111827"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M142 164V132a22 22 0 0 1 22-22h134" stroke="#7187B8" stroke-width="24"/>
+    <path d="M190 206v-44a22 22 0 0 1 22-22h134a22 22 0 0 1 22 22v186a22 22 0 0 1-22 22H212a22 22 0 0 1-22-22v-42" stroke="#A9B9E8" stroke-width="24"/>
+    <path d="M142 246h154a22 22 0 0 1 22 22v112a22 22 0 0 1-22 22H142a22 22 0 0 1-22-22V268a22 22 0 0 1 22-22Z" fill="#EDF1FF" stroke="#EDF1FF" stroke-width="12"/>
+    <path d="M160 286h90M160 324h56" stroke="#52648F" stroke-width="18"/>
+    <path d="M270 324h28m-14-14v28" stroke="#F08A5D" stroke-width="16"/>
+  </g>
+</svg>

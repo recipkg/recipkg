@@ -22,6 +22,7 @@ BUILTIN_SKILLS = {
     "rewrite-software",
     "add-dependency",
     "discover-dependencies",
+    "migrate-to-recipkg",
 }
 
 

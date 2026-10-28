@@ -7,14 +7,14 @@
 | 项目 | Recipkg |
 | 中文名 | 构方 |
 | 包类型 | 软件配方包 / Recipe Package |
-| GitHub 组织显示名 | Recipkg |
+| GitHub 组织显示名 | Recipkg · 构方 |
 | 首选组织标识 | `recipkg` |
 | 备选显示名与标识 | Recipkg Project / `recipkg-project` |
 | 建议主仓库 | `recipkg/recipkg` |
 
 Recipkg 由 recipe 与 pkg 组合：管理软件的“配方包”。名称同时容纳软件重建提示词和 Agent 技能，不限定模型提供方或目标编程语言。
 
-以上是命名建议，不表示已创建组织、注册包名或取得相关账号。组织标识是否可用，以实际创建时的平台结果为准。
+组织已创建，标识为 `recipkg`；主仓库位于 `recipkg/recipkg`。
 
 ## 初期仓库结构
 

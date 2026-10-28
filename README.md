@@ -1,5 +1,7 @@
 # Recipkg · 构方
 
+<img src="assets/recipkg-mark.svg" width="96" alt="Recipkg logo">
+
 **把软件的配方交给 Agent。** Recipkg 管理软件重建提示词、递归依赖和 Agent 技能；软件配方包只包含 UTF-8 Markdown 文件。
 
 [English](README.en.md) · [包格式](docs/SPEC.md) · [设计理念](docs/PHILOSOPHY.md) · [组织命名](docs/ORGANIZATION.md)
@@ -37,7 +39,7 @@ recipkg build hello-0.1.0.recipe.tar.gz --output hello-build.md
 
 ## 重建 Recipkg 自身
 
-`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、五个模板和五个技能。可以把它作为第一个正式配方包：
+`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、五个模板和六个技能。可以把它作为第一个正式配方包：
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -103,7 +105,7 @@ recipkg remove my-app@0.1.0
 
 ## 同步技能
 
-内置技能：`software-to-prompt`、`prompt-to-software`、`rewrite-software`、`add-dependency`、`discover-dependencies`。
+内置技能：`software-to-prompt`、`prompt-to-software`、`rewrite-software`、`add-dependency`、`discover-dependencies`、`migrate-to-recipkg`。
 
 ```sh
 recipkg skills list

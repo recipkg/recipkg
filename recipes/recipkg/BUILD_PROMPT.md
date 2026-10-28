@@ -14,7 +14,7 @@
 | `SPEC.md` | 清单、递归依赖、归档、锁文件、提示词和技能格式 |
 | `ACCEPTANCE.md` | 独立于实现的可观察验收条件 |
 | `templates/*.md` | 五个主动作的完整默认模板，作为静态资源原样交付 |
-| `skills/*/SKILL.md` | 五个内置技能，作为静态资源原样交付 |
+| `skills/*/SKILL.md` | 六个内置技能，作为静态资源原样交付 |
 | `PHILOSOPHY.md` | 项目目标与“0 代码”的准确范围 |
 | `LICENSE.md` | 随资源保留的 MIT 许可 |
 

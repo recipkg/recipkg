@@ -1,5 +1,7 @@
 # Recipkg
 
+<img src="assets/recipkg-mark.svg" width="96" alt="Recipkg logo">
+
 **Give the agent a recipe for the software.** Recipkg manages software reconstruction prompts, recursive dependencies, and Agent Skills. Recipe packages contain UTF-8 Markdown files only.
 
 [中文](README.md) · [Format specification](docs/SPEC.md) · [Project philosophy](docs/PHILOSOPHY.md)
@@ -35,7 +37,7 @@ Give `hello-build.md` to your chosen agent. The prompt includes the root recipe 
 
 ## Reconstruct Recipkg itself
 
-`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, five templates, and five skills.
+`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, five templates, and six skills.
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -101,7 +103,7 @@ The default store is `$XDG_DATA_HOME/recipkg`, falling back to `~/.local/share/r
 
 ## Skills
 
-Five skills are included: `software-to-prompt`, `prompt-to-software`, `rewrite-software`, `add-dependency`, and `discover-dependencies`.
+Six skills are included: `software-to-prompt`, `prompt-to-software`, `rewrite-software`, `add-dependency`, `discover-dependencies`, and `migrate-to-recipkg`.
 
 ```sh
 recipkg skills list
