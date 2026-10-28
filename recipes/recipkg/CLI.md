@@ -58,7 +58,7 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 | `skills list` | 按名称稳定排序列出全部可同步技能。 |
 | `skills sync --dest <directory>` | 必须显式指定目标，检查冲突后同步托管技能。 |
 
-技能来源有三种：本工具内置的 `migrate-to-recipkg`、`rewrite-to-recipkg`、`test-feedback`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。独立技能包同步时移除根 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
+技能来源有三种：本工具内置的 `migrate-to-recipkg`、`rewrite-to-recipkg`、`test-feedback`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。所有技能来源同步时移除技能根部 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
 
 同名同内容可以合并；同名不同内容失败。技能的 `name` 和 `description` 必须是有效 YAML 字符串，保留原始文件。支持普通、单引号、双引号及常用块标量写法；名字遵守协议名称规则，描述非空且最长 1024 字符。
 
@@ -76,4 +76,4 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 
 关键词最多 200 字符且无控制字符，按普通文本引用；加入固定过滤条件后的查询最多 256 字符。请求超时 15 秒、响应最多 4 MiB。可选 `GH_TOKEN` 优先于 `GITHUB_TOKEN`，仅用于 GitHub 请求头，不跟随重定向。搜索不下载、安装或执行候选，不改变其他命令的离线边界。
 
-`--lang en` 选择 `<action>.en.md`，`--lang zh-CN` 选择 `<action>.md`，默认英文。自定义模板优先于内置语言选择；根配方、完整依赖及用户文本原样插入，不二次展开。协议动作、帮助与诊断为英文。源码位于一层 `generated/`；核心配方与公开技能不依赖源码目录存在。
+`--lang en` 选择 `<action>.en.md`，`--lang zh-CN` 选择 `<action>.md`，默认英文。自定义模板优先于内置语言选择；根配方、完整依赖及用户文本原样插入，不二次展开。协议动作、帮助与诊断为英文。源码是 `generated/cli-source/` 子模块，来自独立的 `recipkg/cli-source` 仓库；核心配方与公开技能不依赖源码目录存在。

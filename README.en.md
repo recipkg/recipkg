@@ -12,18 +12,18 @@ The project's vision is to preserve enough intent for future AI systems to recon
 
 Python 3.11 or newer is required. The runtime uses the Python standard library; Git dependencies require the system Git executable.
 
-Clone with `git clone https://github.com/recipkg/recipkg.git`. Recipes, specifications, and public skills are the primary input; the replaceable CLI source lives in `generated/`.
+Clone with `git clone --recurse-submodules https://github.com/recipkg/recipkg.git`. Recipes, specifications, and public skills are the primary input; the replaceable CLI source is pinned as the `generated/cli-source/` submodule from its own repository. Existing checkouts should run `git submodule update --init --recursive`.
 
 From this checkout:
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python3 -m pip install ./generated
+python3 -m pip install ./generated/cli-source
 recipkg --help
 ```
 
-For a user-global command, run `uv tool install ./generated`. You can also install a distributed wheel. These instructions do not assume that the project has been published to a public package registry.
+For a user-global command, run `uv tool install ./generated/cli-source`. You can also install a distributed wheel. These instructions do not assume that the project has been published to a public package registry.
 
 ## Try the recursive example
 
@@ -146,7 +146,9 @@ Three public skills ship with the CLI, with English entry points and `SKILL.zh-C
 | `rewrite-to-recipkg` | Observe, specify, establish a recipe repository, rebuild, and verify |
 | `test-feedback` | Run target-user end-to-end tasks and synthesize requirements from real tests and related issues |
 
-Development skills for building packages, managing Git repositories, and updating Recipkg are project-level tools under `.agents/skills/` and are not shipped by the CLI.
+All 11 project skills have independent canonical GitHub repositories pinned as submodules: three public skills under `recipes/recipkg/skills/`, and eight development skills under `.agents/skills/`. Migrated projects must reuse the same repositories as skill submodules instead of copying text. Development skills are not CLI builtins. See the [repository catalog](docs/SKILLS.md).
+
+`skills sync` remains a managed-copy option for non-Git destinations; it does not create or replace project skill submodules.
 
 ```sh
 recipkg skills list
@@ -166,7 +168,7 @@ Markdown may contain declarative configuration, interface descriptions, and inpu
 ## Development
 
 ```sh
-RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/src python3 -m unittest discover -s generated/tests -v
+RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -v
 ```
 
 Read [AGENTS.md](AGENTS.md) before contributing. Keep the format specification, examples, and observable CLI behavior aligned.

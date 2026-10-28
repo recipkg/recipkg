@@ -5,7 +5,8 @@
 - Added explicit GitHub discovery with `recipkg search`; recipe repositories must carry the `recipkg` topic.
 - Added public `test-feedback` and `rewrite-to-recipkg` skills with English and Simplified Chinese documentation.
 - Added English prompt templates (now the default) and `--lang en|zh-CN`; recipe and custom-template bytes remain unchanged.
-- Made recipes the primary repository input and moved the replaceable CLI implementation into the `generated/` directory.
+- Made recipes the primary repository input and pinned the separate `recipkg/cli-source` repository at `generated/cli-source/`.
+- Split all eleven project skills into independent canonical repositories, referenced by pinned submodules and reused during migration.
 
 ## 0.1.0 — Initial version
 

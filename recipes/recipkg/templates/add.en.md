@@ -33,4 +33,4 @@ Deliver the updated recipe, complete dependency material, and observable integra
 
 ### Repository convention
 
-GitHub recipe repositories must carry the `recipkg` topic. Generated source belongs under `generated/`, with no extra implementation-name directory; when independently versioned, use this directory itself as a pinned source submodule; it is never recipe payload. `recipkg search [keywords]` finds candidates, not validated packages.
+GitHub recipe repositories must carry the `recipkg` topic. Generated source lives in separate repositories, checked out as pinned Git submodules at `generated/<source-repository-name>/`. The `generated/` directory is only a container; source is never recipe payload. Reuse shared project skill repositories as pinned submodules rather than copying them. `recipkg search [keywords]` finds candidates, not validated packages.

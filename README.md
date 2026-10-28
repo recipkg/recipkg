@@ -14,18 +14,18 @@
 
 需要 Python 3.11 或更新版本。运行时仅依赖 Python 标准库；解析 Git 依赖时需要系统 Git。
 
-克隆本仓库：`git clone https://github.com/recipkg/recipkg.git`。配方、规范和技能是主要输入，生成的 CLI 源码位于`generated/`。
+克隆本仓库：`git clone --recurse-submodules https://github.com/recipkg/recipkg.git`。配方、规范和技能是主要输入，生成的 CLI 源码由独立仓库 `recipkg/cli-source` 管理，在 `generated/cli-source/` 以子模块引用。
 
 在本仓库目录执行：
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python3 -m pip install ./generated
+python3 -m pip install ./generated/cli-source
 recipkg --help
 ```
 
-希望直接作为用户全局命令使用时，可运行 `uv tool install ./generated`；命令会安装到用户工具目录。也可以从分发的 wheel 安装。项目尚未承诺已经发布到公共包注册表。
+希望直接作为用户全局命令使用时，可运行 `uv tool install ./generated/cli-source`；命令会安装到用户工具目录。也可以从分发的 wheel 安装。项目尚未承诺已经发布到公共包注册表。
 
 ## 先跑一个递归示例
 
@@ -148,7 +148,9 @@ recipkg remove my-app@0.1.0
 | `rewrite-to-recipkg` | 观察、提取配方、建立规范仓库，再按配方重写并验收 |
 | `test-feedback` | 模拟目标用户实际走端到端路径，结合本项目和相关项目的 issue 合成需求 |
 
-本仓库开发使用的构建、仓库管理和更新技能位于 `.agents/skills/`，属于项目级工具，不随 CLI 发布。
+全部 11 个项目技能各有一个独立 GitHub 仓库，以固定提交的子模块引用。3 个公开技能在 `recipes/recipkg/skills/`，8 个开发技能在 `.agents/skills/`；开发技能不作为 CLI 内置技能发布。迁移后的项目必须复用这些相同仓库作为技能子模块，不逐项目复制内容。[仓库与更新清单](docs/SKILLS.md)。
+
+`skills sync` 仍为不使用 Git 的目标生成托管副本，不会创建项目子模块，也不代替上述仓库引用。
 
 ```sh
 recipkg skills list
@@ -166,7 +168,7 @@ recipkg skills sync --dest /path/to/your-agent/skills
 ## 开发
 
 ```sh
-RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/src python3 -m unittest discover -s generated/tests -v
+RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -v
 ```
 
 贡献前请阅读 [AGENTS.md](AGENTS.md)。格式变更应同步更新规范、示例和 CLI 的行为验证。
