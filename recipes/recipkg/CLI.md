@@ -18,7 +18,7 @@
 | `add` | `add-dependency` | `<package> <source>` |
 | `discover` | `discover-dependencies` | `<package>` |
 
-每个动作接受 `--request <text>`、`--output <file>`（简写 `-o`）与 `--template <file.md>`。`add` 还接受 `--alias <name>`，默认 `dependency`，别名使用协议的名称规则。
+每个动作接受 `--lang en|zh-CN`（默认英文）和 `--request <text>`、`--output <file>`（简写 `-o`）与 `--template <file.md>`。`add` 还接受 `--alias <name>`，默认 `dependency`，别名使用协议的名称规则。
 
 没有 `--output` 时 stdout 只有生成的 Markdown 提示词。有输出路径时，创建其父目录并写入新文件；如果文件已存在就报错，不覆盖。成功写入的提示可到 stderr，stdout 不混入状态文字。
 
@@ -58,7 +58,7 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 | `skills list` | 按名称稳定排序列出全部可同步技能。 |
 | `skills sync --dest <directory>` | 必须显式指定目标，检查冲突后同步托管技能。 |
 
-技能来源有三种：本工具内置的 `migrate-to-recipkg`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。独立技能包同步时移除根 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
+技能来源有三种：本工具内置的 `migrate-to-recipkg`、`rewrite-to-recipkg`、`test-feedback`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。独立技能包同步时移除根 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
 
 同名同内容可以合并；同名不同内容失败。技能的 `name` 和 `description` 必须是有效 YAML 字符串，保留原始文件。支持普通、单引号、双引号及常用块标量写法；名字遵守协议名称规则，描述非空且最长 1024 字符。
 
@@ -68,4 +68,12 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 
 ## 资源与分发
 
-安装后的工具必须自带五个模板与唯一内置技能 `migrate-to-recipkg`，离开源码 checkout 仍能运行。包格式、提示词格式与生成软件语言没有绑定。各命令帮助应解释“输出提示词”和“执行任务”的区别。
+安装后的工具必须自带五主动作的中英文模板与三个内置技能，以及中文译文和反馈格式，离开源码 checkout 仍能运行。包格式、提示词格式与生成软件语言没有绑定。各命令帮助应解释“输出提示词”和“执行任务”的区别。
+
+## 搜索与语言细节
+
+`search [query]` 显式使用 GitHub repository search API 搜索带 `recipkg` topic 的公开仓库。`--limit` 为 1–100、默认 20。`--json` 的 stdout 为候选数组，字段是 `repository`、`url`、`description`、`default_branch`；普通输出为身份、URL、描述。空结果成功；网络、认证、限流、无效或超限响应退出 2，不输出部分结果。不完整结果警告和“候选仍需验证”说明在 stderr。
+
+关键词最多 200 字符且无控制字符，按普通文本引用；加入固定过滤条件后的查询最多 256 字符。请求超时 15 秒、响应最多 4 MiB。可选 `GH_TOKEN` 优先于 `GITHUB_TOKEN`，仅用于 GitHub 请求头，不跟随重定向。搜索不下载、安装或执行候选，不改变其他命令的离线边界。
+
+`--lang en` 选择 `<action>.en.md`，`--lang zh-CN` 选择 `<action>.md`，默认英文。自定义模板优先于内置语言选择；根配方、完整依赖及用户文本原样插入，不二次展开。协议动作、帮助与诊断为英文。源码位于一层 `generated/`；核心配方与公开技能不依赖源码目录存在。

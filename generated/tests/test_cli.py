@@ -18,6 +18,8 @@ import unittest
 REPOSITORY = Path(__file__).resolve().parents[1]
 BUILTIN_SKILLS = {
     "migrate-to-recipkg",
+    "rewrite-to-recipkg",
+    "test-feedback",
 }
 
 
@@ -157,6 +159,57 @@ class CLIAcceptanceTests(unittest.TestCase):
         self.assertEqual(output.read_text(encoding="utf-8"), expected)
         self.cli("build", package, "--output", output, success=False)
         self.assertEqual(output.read_text(encoding="utf-8"), expected)
+
+    def test_prompt_languages_keep_recipe_and_user_material_verbatim(self) -> None:
+        package = self.recipe("multilingual", marker="原始配方必须完整保留 ORIGINAL_CONTRACT")
+        before = snapshot(package)
+        request = "Keep literal {{context}} and 中文要求."
+        for action in ("extract", "build", "rewrite", "add", "discover"):
+            arguments = (action, package, "../other") if action == "add" else (action, package)
+            english = self.cli(*arguments, "--request", request).stdout
+            chinese = self.cli(*arguments, "--request", request, "--lang", "zh-CN").stdout
+            with self.subTest(action=action):
+                self.assertIn("## Task:", english)
+                self.assertIn("## 任务：", chinese)
+                self.assertNotEqual(english, chinese)
+                for output in (english, chinese):
+                    self.assertIn(request, output)
+                    self.assertIn(f'action = "{action}"', output)
+                    if action != "extract":
+                        self.assertIn("原始配方必须完整保留 ORIGINAL_CONTRACT", output)
+        self.assertEqual(snapshot(package), before)
+        self.assertEqual(self.cli("build", package, "--lang", "fr", success=False).stdout, "")
+
+    def test_custom_template_is_not_replaced_by_language_selection(self) -> None:
+        package = self.recipe("custom-language")
+        template = self.work / "custom.md"
+        template.write_text("# Mon modèle\n\n{{context}}\n", encoding="utf-8")
+        english = self.cli("build", package, "--template", template, "--lang", "en").stdout
+        chinese = self.cli("build", package, "--template", template, "--lang", "zh-CN").stdout
+        self.assertEqual(english, chinese)
+        self.assertIn("Mon modèle", english)
+
+    def test_self_recipe_carries_all_languages_skills_and_quality_contract(self) -> None:
+        recipe_root = Path(os.environ.get("RECIPKG_RECIPE_ROOT", str(REPOSITORY.parent)))
+        recipe = recipe_root / "recipes/recipkg"
+        if not recipe.is_dir():
+            self.skipTest("Set RECIPKG_RECIPE_ROOT to the canonical recipe checkout for integration acceptance")
+        archive = self.work / "recipkg.recipe.tar.gz"
+        self.cli("pack", recipe, "-o", archive)
+        self.cli("check", archive)
+        with tarfile.open(archive, "r:gz") as packed:
+            files = {item.name: packed.extractfile(item).read() for item in packed if item.isfile()}
+        for source in (REPOSITORY / "src/recipkg/data").rglob("*.md"):
+            relative = source.relative_to(REPOSITORY / "src/recipkg/data").as_posix()
+            self.assertEqual(files[relative], source.read_bytes(), relative)
+        self.assertIn(".deps/quality/BUILD_PROMPT.md", files)
+        self.cli("install", archive)
+        self.assertEqual(set(self.cli("skills", "list").stdout.splitlines()), BUILTIN_SKILLS)
+        destination = self.work / "self-skills"
+        self.cli("skills", "sync", "--dest", destination)
+        for source in (REPOSITORY / "src/recipkg/data/skills").rglob("*.md"):
+            relative = source.relative_to(REPOSITORY / "src/recipkg/data/skills")
+            self.assertEqual((destination / relative).read_bytes(), source.read_bytes())
 
     def test_archive_install_build_and_unpack_work_without_original_sources(self) -> None:
         leaf = self.recipe("leaf", marker="PORTABLE_LEAF_74dd")

@@ -56,6 +56,8 @@ def parser() -> argparse.ArgumentParser:
         sub.add_argument("--request", default="", help="additional user requirements")
         sub.add_argument("--output", "-o", type=Path, help="write the prompt to a new file")
         sub.add_argument("--template", type=Path, help="use a custom Markdown template")
+        sub.add_argument("--lang", choices=("en", "zh-CN"), default="en",
+                         help="built-in prompt language (default: en); recipe content stays unchanged")
     init = commands.add_parser("init", help="create a Markdown-only package skeleton")
     init.add_argument("path", type=Path)
     init.add_argument("--name")
@@ -72,6 +74,10 @@ def parser() -> argparse.ArgumentParser:
     install.add_argument("source")
     listing = commands.add_parser("list", help="list installed recipe versions")
     listing.add_argument("--json", action="store_true")
+    search = commands.add_parser("search", help="search public GitHub repositories with the recipkg topic")
+    search.add_argument("query", nargs="?", default="", help="keywords (optional)")
+    search.add_argument("--limit", type=int, default=20, help="maximum candidates, 1-100 (default: 20)")
+    search.add_argument("--json", action="store_true", help="print repository candidates as JSON")
     remove = commands.add_parser("remove", help="remove an installed recipe version")
     remove.add_argument("name")
     skills = commands.add_parser("skills", help="list and synchronize Markdown-only Agent Skills")
@@ -82,13 +88,14 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
-def _read_template(action: str, custom: Path | None) -> str:
+def _read_template(action: str, custom: Path | None, language: str = "en") -> str:
     if custom is not None:
         if custom.suffix != ".md":
             raise RecipeError("Custom templates must be .md files")
         value = custom.read_text(encoding="utf-8")
     else:
-        value = resources.files("recipkg").joinpath("data", "templates", f"{action}.md").read_text(encoding="utf-8")
+        filename = f"{action}.en.md" if language == "en" else f"{action}.md"
+        value = resources.files("recipkg").joinpath("data", "templates", filename).read_text(encoding="utf-8")
     if "\x00" in value:
         raise RecipeError("Templates must be UTF-8 text without NUL bytes")
     allowed = {"target", "request", "source", "alias", "context"}
@@ -102,7 +109,7 @@ def _read_template(action: str, custom: Path | None) -> str:
 
 def render(args: argparse.Namespace, home: Path) -> str:
     action = ACTIONS[args.command]
-    template = _read_template(action, args.template)
+    template = _read_template(action, args.template, args.lang)
     context = ""
     if action != "extract":
         context = context_text(resolve_ref(args.target, home))
@@ -231,6 +238,21 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 for recipe in recipes:
                     print(f"{recipe.name}@{recipe.version}\t{recipe.kind}\t{recipe.description}")
+        elif args.command == "search":
+            from .search import search_packages
+            candidates, incomplete = search_packages(args.query, args.limit)
+            if args.json:
+                print(json.dumps(candidates, ensure_ascii=False, indent=2))
+            else:
+                for candidate in candidates:
+                    description = " ".join(candidate["description"].split())
+                    print(f"{candidate['repository']}\t{candidate['url']}\t{description}")
+                if not candidates:
+                    print("No matching repositories.")
+            print("Repository candidates only: verify RECIPE.md and its path before packaging; "
+                  "a topic is not validation or an endorsement.", file=sys.stderr)
+            if incomplete:
+                print("GitHub returned incomplete search results; narrow your query.", file=sys.stderr)
         elif args.command == "remove":
             print(f"Removed {remove_package(args.name, home)}")
         elif args.command == "skills":

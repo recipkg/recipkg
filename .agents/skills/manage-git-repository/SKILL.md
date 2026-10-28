@@ -45,3 +45,7 @@ git ls-files | sort | uniq -d
 - [Git LFS 说明](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-git-large-file-storage)
 - [GitHub 仓库限制](https://docs.github.com/en/repositories/creating-and-managing-repositories/repository-limits)
 - [Git 子模块](https://git-scm.com/docs/git-submodule)
+
+## 配方与生成源码布局
+
+以配方、规范和验收合同作为主要输入；生成实现默认位于 `generated/`（generated 表示已生成的结果），不额外套层；需要独立源码版本管理时，直接将该目录作为固定提交子模块。项目保持原名，源码仓库名称全小写、连字符。不要将实现源码打进配方归档，也不要为迁就实现削弱验收。保留原有未提交工作；发布 GitHub 配方仓库时添加 `recipkg` topic 并核对。

@@ -36,7 +36,7 @@ class SkillSynchronizationTests(unittest.TestCase):
 
     def test_listing_does_not_create_a_store(self) -> None:
         names = list_skills(self.home)
-        self.assertEqual(names, ["migrate-to-recipkg"])
+        self.assertEqual(names, ["migrate-to-recipkg", "rewrite-to-recipkg", "test-feedback"])
         self.assertFalse(self.home.exists())
 
     def test_required_metadata_accepts_a_folded_description(self) -> None:

@@ -25,7 +25,7 @@ Recipkg 的独立 Git 仓库是唯一真相源。宿主项目通过 Git 子模�
    加入后检查 `.gitmodules`、gitlink commit、子模块 branch policy 和当前 CLI 版本。项目必须 pin commit；即使配置追踪 branch，也要审查并显式提交父仓库指针变动。
 
 4. 运行 `tools/recipkg/.venv/bin/recipkg --help` 或在可用的本地开发安装方式下确认 CLI 入口。先读 `--help` 和该版本文档，不猜 CLI 子命令、参数或输出路径。Recipkg 当前用 `skills sync` 管理可同步技能时，按其帮助显示的参数同步到宿主项目的目标目录；先预览目标和现有同名文件。项目公开安装入口只需同步 `migrate-to-recipkg`。
-5. 验证同步后的 skill 与固定子模块内的 `src/recipkg/data/skills/migrate-to-recipkg/SKILL.md` 完全一致；managed copy 加入 `.gitignore` 还是提交到宿主仓库，遵循宿主项目策略。若提交生成副本，要标注它由哪个 submodule commit 同步，禁止人工编辑。
+5. 验证同步后的 skill 与固定子模块内的 `recipes/recipkg/skills/migrate-to-recipkg/SKILL.md` 完全一致；managed copy 加入 `.gitignore` 还是提交到宿主仓库，遵循宿主项目策略。若提交生成副本，要标注它由哪个 submodule commit 同步，禁止人工编辑。
 6. 需要自定义说明时，写在独立的项目说明或用户管理区，不在 managed 文件内追加，以免下次 sync 丢失。上游修改先在 Recipkg 仓库完成，再升级子模块 pin 和同步副本。
 7. 提交前审查父仓库 `git diff -- .gitmodules`、gitlink diff、目标 skill 内容、ignore 和未提交文件；运行本地相关检查。只 commit 授权范围内的 `.gitmodules`、gitlink 和 managed skill 路径，不替用户提交其余变更。
 
@@ -63,3 +63,7 @@ CLI 参数或安装方法可能随版本变化，先以该子模块 commit 内�
 - managed skill 内容来自固定 commit，没有手工漂移；宿主自定义说明保存在独立位置。
 - 父仓库 diff 只包含约定的 submodule metadata/gitlink/skill 更新和说明。
 - 本地检查结果与未运行的 CI、registry 发布、正式部署分别报告。
+
+## 当前上游布局
+
+Recipkg 主仓库以配方为核心，CLI 源码直接在 `generated/`。只有该目录实际采用子模块时才需要递归初始化；在宿主项目安装 CLI 用 `python3 -m pip install tools/recipkg/generated`，不要再假设主仓库根有 Python 构建清单。公开技能真相源在 `tools/recipkg/recipes/recipkg/skills/`。

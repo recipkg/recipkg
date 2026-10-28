@@ -1,47 +1,46 @@
 ---
 name: migrate-to-recipkg
-description: Turn an existing software project into a Recipkg package of Markdown reconstruction instructions, recursive dependency recipes, and observable acceptance criteria.
+description: Turn an existing software project into a Markdown-only Recipkg recipe with recursive dependencies, observable acceptance criteria, and a discoverable recipe repository.
 ---
 
-# 将现有软件迁移到 Recipkg
+# Migrate software to Recipkg
 
-## 输入
+[简体中文](SKILL.zh-CN.md)
 
-- 软件目录、Git 仓库或可观察产品。
-- 用户希望保留的行为、目标环境和迁移范围。
-- 配方输出目录；若未指定，选择源码目录之外的新目录。
+## Inputs and boundaries
 
-## 边界
+Use the software directory, Git repository, or observable product; behavior to preserve; target environments; and a recipe output location. A recipe preserves requirements, interfaces, dependencies, and acceptance conditions for a future rebuild. Keep implementation source, binaries, generated output, and installation scripts out of its payload. Writing a recipe is not rebuilding software.
 
-配方保存软件的需求、接口、依赖关系和验收条件，供未来的 Agent 重建实现。不要把原软件源码、二进制、生成物或安装脚本复制进配方包。不要把“写出配方”说成“已经重建软件”。
+## Resolve choices before changing the layout
 
-## 开始前先问用户
+Read the conversation and project materials first. Ask only for consequential missing information, grouping questions together. While waiting for required answers, inspect material without creating repositories or changing their layout.
 
-先检查当前对话和项目材料里是否已经回答了这些问题；只询问缺失项，一次整理成一组问题发出。编程语言和目标平台允许多选。等用户回答后再确定会影响配方内容或仓库布局的选择；等待期间可以只读检查源码，不要创建文件、加子模块或改动 Git 布局。
+1. **Language preferences:** retain the source language or select languages suitable for the target platforms. Record the preference and whether the rebuilding agent may choose another language.
+2. **Product intent:** identify problems to solve, behavior to preserve, requested changes, non-goals, and constraints.
+3. **Design and interaction:** for visual products, establish references, identity, hierarchy, density, color, typography, and motion where known. Avoid generic AI dashboards. CLI/API products still need readable output, errors, and documentation.
+4. **Internationalization:** preserve current languages or specify additional locales, right-to-left support, formatting, time zones, and translation maintenance. Mark unknowns explicitly.
+5. **Target platforms:** identify applicable desktop, mobile, browser, server, or embedded environments, including known minimum versions and architectures.
+6. **Performance:** identify important workloads, devices, latency, throughput, memory, network, or distribution-size constraints. Do not invent targets; record unknown budgets and real baselines when measurement is in scope.
+7. **Repository layout:** use a separate migration workspace with the original repository pinned as a `source/` submodule by default, or retain an established same-repository layout with `recipes/<package-name>/`. Existing conventions or user choices take precedence. The source checkout is observation material, never a recipe dependency or archive payload.
 
-1. **偏好的编程语言（可多选）**：保留源码语言、Python、TypeScript/JavaScript、Rust、Go、Java/Kotlin、C/C++、C#、Swift、其他（请写明）。请标出首选项，并说明是否允许 Agent 根据目标平台改选语言。
-2. **自由描述**：希望重建的软件要解决什么问题？哪些现有行为必须保留，哪些要修改或新增？有什么明确的非目标、限制或补充要求？
-3. **视觉与交互审美（适用于有 UI/TUI/文档网站的项目）**：可以给参考产品、希望的品牌气质、色彩/排版/密度或动效偏好。是否要避免通用 AI 模板感？没有参考时按真实用户、内容和任务设计，不套默认 dashboard。CLI/API 项目可说明输出、错误提示和文档的风格要求。
-4. **国际化**：不需要、沿用现有语种，还是需要新增语种？如需要，请列出语言/地区（locale），并说明是否有从右到左排版、日期数字格式、时区或翻译维护要求；不确定的部分标成待确认。
-5. **目标平台（可多选）**：Linux、macOS、Windows、Web 浏览器、服务器/容器、Android、iOS、嵌入式设备或其他。请补充最低版本、CPU 架构、浏览器或部署环境等已知约束。
-6. **性能约束**：最重要的工作流和负载规模是什么？已知的启动时间、关键操作延迟、吞吐、内存、网络/包体积预算或目标设备有哪些？若暂无数字请说“未知”，不要猜指标；迁移时先记录基线与假设。
-7. **仓库布局**：
-   - **默认：独立迁移工作区 + Git 子模块**。在工作区的 `source/` 添加原源码仓库为 Git 子模块，Recipkg 配方放在 `recipes/<package-name>/`。
-   - **同一个 Git 仓库**：把 `recipes/<package-name>/` 放进现有源码仓库，不创建子模块。
+Before adding a source submodule, verify its remote and reviewed commit. Preserve local work; resolve the observation scope when uncommitted source affects it. Do not overwrite an existing output directory.
 
-无选择时采用默认布局。只有确认源码仓库有可用的 Git 远程地址后才添加子模块，并固定在检查过的提交；若没有远程地址或当前源码有未提交改动影响迁移材料，先询问如何处理。无论选哪种布局，`source/` 都只是供迁移 Agent 阅读和对照的源码位置，不得把它声明成 Recipkg 配方依赖，也不得将源码打进配方归档。`recipkg pack` 只打包 `recipes/<package-name>/` 中的配方材料。
+## Procedure
 
-## 步骤
+1. Read applicable project instructions, README, licensing, build metadata, interfaces, and acceptance evidence. Record the observation version and scope; distinguish observations, assertions from tests/docs, inferences, and unknowns.
+2. Generate an observation checklist with `recipkg extract <target> --lang en` or `--lang zh-CN`. The CLI only prints a task; actually inspect authorized source or products.
+3. Reuse a valid recipe, or create a scaffold with `recipkg init <output> --name <package-name>`. Complete `RECIPE.md`, `BUILD_PROMPT.md`, and `ACCEPTANCE.md` with behavior, interfaces, environment, language/platform choices, design direction, quality constraints, and measurable acceptance conditions.
+4. Describe necessary components as recursively complete recipes. Distinguish dependencies from operating systems, compilers, accounts, datasets, remote services, and references. Source-only repositories are not recipe dependencies. Use `recipkg search [keywords]` for candidates, then inspect the recipe and pin a reviewed source.
+5. Define success, failure, boundary, and integration checks. For UI products include important states, narrow layouts, and accessibility. Record performance workloads, environments, commands, and methods only when measured; keep unperformed checks unverified.
+6. GitHub repositories publishing Recipkg recipes must carry the `recipkg` topic. When publication is authorized, use `gh repo edit <owner/repo> --add-topic recipkg` or available tooling, preserve existing topics, and read back the result. For local-only repositories record this publishing requirement. Topics enable discovery, not validation or trust.
+7. Ensure every payload file is UTF-8 `.md` without implementation source, binaries, filesystem links, or execution hooks. Run `recipkg check <output>`, package complete dependencies with `recipkg pack <output> -o <archive>`, check the archive, and render its full build prompt. Write archives outside the source directory.
 
-1. 按用户确认的布局定位目标仓库和输出目录。阅读适用的 `AGENTS.md`、README、许可证、构建清单、接口文档和现有验收材料；检查 Git 状态并保留用户改动。不要覆盖源码或已有目标目录。
-2. 使用 `recipkg extract <target>` 生成标准化观察提示词，并将其作为检查清单。该命令只打印提示词；Agent 仍须实际查看获准访问的源码或产品。
-3. 记录证据来源和范围：主要用户行为、输入输出、命令与 API、数据格式、错误、边界条件、运行环境和安全约束。区分直接观察、从测试或文档得出的事实、推断和未知项。已有测试只覆盖其实际断言的行为。
-4. 按已选布局用 `recipkg init <output> --name <package-name>` 创建软件配方骨架；同仓布局时将 `<output>` 放在源码仓库的 `recipes/<package-name>/`，子模块布局时将它放在工作区的 `recipes/<package-name>/`。完善 `RECIPE.md` 中的包信息与有效配方依赖，使用 `BUILD_PROMPT.md` 描述用户确认的语言偏好、国际化范围、目标平台、可观察行为、接口和实现约束，并在 `ACCEPTANCE.md` 写明可复现的输入、操作和预期结果。需要较长说明时可增加 Markdown 文件，并从入口文件明确链接或引用。
-4. 按已选布局用 `recipkg init <output> --name <package-name>` 创建软件配方骨架；同仓布局时将 `<output>` 放在源码仓库的 `recipes/<package-name>/`，子模块布局时将它放在工作区的 `recipes/<package-name>/`。完善 `RECIPE.md` 中的包信息与有效配方依赖，使用 `BUILD_PROMPT.md` 描述用户确认的语言偏好、国际化范围、目标平台、设计方向、代码质量、性能预算、可观察行为、接口和实现约束，并在 `ACCEPTANCE.md` 写明可复现的输入、操作和预期结果。需要较长说明时可增加 Markdown 文件，并从入口文件明确链接或引用。
-5. 画出必要依赖图。需要由 Agent 一起重建的软件组件各自写成配方，并以递归依赖声明；普通源码仓库不是有效配方来源。操作系统、编译器、账号、数据集和远程服务等外部前提要单独写明，不能伪装成已打包依赖。无法确定的依赖或行为保留为明确问题，不要静默省略。
-6. 从文档、测试和可运行实例提炼验收场景，覆盖关键成功路径、失败行为、边界条件和依赖集成。有 UI 时验收布局层级、关键状态、窄屏与可访问性；记录性能基线的 workload、设备、命令和统计口径，不编造目标或结果。只在实际运行后记录检查结果；未运行的检查标记为未验证。除非迁移范围包含基线运行，否则不要为推断结果而改动原项目。
-7. 确认配方负载只含 UTF-8 `.md` 文件，不含源码、二进制、链接或可执行钩子。运行 `recipkg check <output>`；依赖齐备时运行 `recipkg pack <output> -o <archive>`，再检查归档并用 `recipkg build <archive>` 查看最终交付给 Agent 的完整提示词。将归档写到源码目录之外。
+## Deliverable
 
-## 输出
+Provide the recipe directory and optional archive, source version, languages/platforms/layout, preserved behavior, recursive dependencies, external prerequisites, inference, and unperformed checks. Preserve attribution and licensing. Successful packaging proves structural delivery, not successful independent reconstruction.
 
-交付配方目录和可选的 `.recipe.tar.gz`，并简要列出用户确认的语言、自由描述中的目标、国际化范围、目标平台、仓库布局、来源版本、已覆盖的行为、递归依赖、外部前提、推断项及未运行的验收。打包和生成提示词只证明材料能被 Recipkg 解析与交付，不证明未来重建已经成功。
+## Generated source layout
+
+Treat recipes as the primary input. Place generated implementation source under `generated/`, with no extra implementation-name directory; when independently versioned, use this directory itself as a pinned source submodule of the recipe repository. Keep observation checkouts separate. Create remotes and push only within existing publication authorization; otherwise complete local work and record its unpublished state.
+
+Keep the original project and primary repository name; do not append `-recipkg`. Independently managed source repositories use lowercase, hyphenated names.

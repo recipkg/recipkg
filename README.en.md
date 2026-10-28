@@ -4,7 +4,7 @@
 
 **Give the agent a recipe for the software.** Recipkg manages software reconstruction prompts, recursive dependencies, and Agent Skills. Recipe packages contain UTF-8 Markdown files only.
 
-[中文](README.md) · [Format specification](docs/SPEC.md) · [Project philosophy](docs/PHILOSOPHY.md)
+[中文](README.md) · [Format specification](docs/SPEC.en.md) · [Project philosophy](docs/PHILOSOPHY.md)
 
 The project's vision is to preserve enough intent for future AI systems to reconstruct software. The current CLI has a narrower, explicit role: its five primary actions render standardized prompts. It does not call a model, execute generated software, or guarantee reconstruction from an incomplete description.
 
@@ -12,16 +12,18 @@ The project's vision is to preserve enough intent for future AI systems to recon
 
 Python 3.11 or newer is required. The runtime uses the Python standard library; Git dependencies require the system Git executable.
 
+Clone with `git clone https://github.com/recipkg/recipkg.git`. Recipes, specifications, and public skills are the primary input; the replaceable CLI source lives in `generated/`.
+
 From this checkout:
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python3 -m pip install .
+python3 -m pip install ./generated
 recipkg --help
 ```
 
-You can also install a distributed wheel. These instructions do not assume that the project has been published to a public package registry.
+For a user-global command, run `uv tool install ./generated`. You can also install a distributed wheel. These instructions do not assume that the project has been published to a public package registry.
 
 ## Try the recursive example
 
@@ -37,7 +39,7 @@ Give `hello-build.md` to your chosen agent. The prompt includes the root recipe 
 
 ## Reconstruct Recipkg itself
 
-`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, five templates, and one bundled skill.
+`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, English/Chinese templates, and three bundled skills.
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -93,6 +95,30 @@ source = "../software-quality"
 
 For an independent repository, use `git`, a reviewed full commit hash in `rev`, and `subdir`. Then describe in the root `BUILD_PROMPT.md` where the `quality` contract applies and how to verify it. `recipkg pack` vendors the dependency under `.deps/quality/`, so consumers receive the full Markdown context. Use a Git submodule only when developers need both repositories checked out together.
 
+## Search for recipes
+
+GitHub repositories publishing Recipkg recipes must have the `recipkg` topic. Preserve other topics when adding it:
+
+```sh
+gh repo edit owner/repo --add-topic recipkg
+recipkg search
+recipkg search "quality" --limit 10
+recipkg search "quality" --json
+```
+
+`search` explicitly queries public GitHub repositories using `topic:recipkg`. Optional `GH_TOKEN` or `GITHUB_TOKEN` authentication can increase the request allowance. Keywords are literal text; `--limit` accepts 1–100, default 20. JSON output is an array containing `repository`, `url`, `description`, and `default_branch`; diagnostics and incomplete-result warnings go to stderr. A topic is neither package validation nor an endorsement: inspect the actual `RECIPE.md`, recipe subdirectory, license, and version before pinning a reviewed full commit. Search does not download implementations, install recipes, or execute content. Empty results succeed; network failures are explicit errors.
+
+## Languages
+
+All five prompt actions default to English; use `--lang zh-CN` for Simplified Chinese or `--lang en` explicitly:
+
+```sh
+recipkg build recipes/recipkg --lang en
+recipkg build recipes/recipkg --lang zh-CN
+```
+
+Language selection changes the task template only. Root and dependency recipes, user requirements, and custom templates remain verbatim; locked materials are never automatically translated. CLI help, diagnostics, and protocol identifiers use English. Public skills provide English entry points and Chinese translations. Read the [English specification](docs/SPEC.en.md) for the package contract.
+
 ## Package operations
 
 ```sh
@@ -112,7 +138,15 @@ The default store is `$XDG_DATA_HOME/recipkg`, falling back to `~/.local/share/r
 
 ## Skills
 
-The only bundled, syncable skill is `migrate-to-recipkg`. Development skills for building packages, managing Git repositories, and updating Recipkg are project-level tools under `.agents/skills/` and are not shipped by the CLI.
+Three public skills ship with the CLI, with English entry points and `SKILL.zh-CN.md` translations:
+
+| Skill | Purpose |
+| --- | --- |
+| `migrate-to-recipkg` | Observe software and extract a complete recursive recipe |
+| `rewrite-to-recipkg` | Observe, specify, establish a recipe repository, rebuild, and verify |
+| `test-feedback` | Run target-user end-to-end tasks and synthesize requirements from real tests and related issues |
+
+Development skills for building packages, managing Git repositories, and updating Recipkg are project-level tools under `.agents/skills/` and are not shipped by the CLI.
 
 ```sh
 recipkg skills list
@@ -132,7 +166,7 @@ Markdown may contain declarative configuration, interface descriptions, and inpu
 ## Development
 
 ```sh
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/src python3 -m unittest discover -s generated/tests -v
 ```
 
 Read [AGENTS.md](AGENTS.md) before contributing. Keep the format specification, examples, and observable CLI behavior aligned.

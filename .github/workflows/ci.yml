@@ -21,9 +21,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install the reference CLI
-        run: python -m pip install .
+        run: python -m pip install ./generated
       - name: Check the protocol and CLI
-        run: python -m unittest discover -s tests -v
+        run: RECIPKG_RECIPE_ROOT="$GITHUB_WORKSPACE" python -m unittest discover -s generated/tests -v
       - name: Exercise the installed package
         run: |
           recipkg --version

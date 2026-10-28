@@ -14,16 +14,18 @@
 
 需要 Python 3.11 或更新版本。运行时仅依赖 Python 标准库；解析 Git 依赖时需要系统 Git。
 
+克隆本仓库：`git clone https://github.com/recipkg/recipkg.git`。配方、规范和技能是主要输入，生成的 CLI 源码位于`generated/`。
+
 在本仓库目录执行：
 
 ```sh
 python3 -m venv .venv
 . .venv/bin/activate
-python3 -m pip install .
+python3 -m pip install ./generated
 recipkg --help
 ```
 
-也可以从分发的 wheel 安装。项目尚未承诺已经发布到公共包注册表。
+希望直接作为用户全局命令使用时，可运行 `uv tool install ./generated`；命令会安装到用户工具目录。也可以从分发的 wheel 安装。项目尚未承诺已经发布到公共包注册表。
 
 ## 先跑一个递归示例
 
@@ -39,7 +41,7 @@ recipkg build hello-0.1.0.recipe.tar.gz --output hello-build.md
 
 ## 重建 Recipkg 自身
 
-`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、五个模板和一个内置技能。可以把它作为第一个正式配方包：
+`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、中英双语模板和三个内置技能。可以把它作为第一个正式配方包：
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -95,6 +97,30 @@ source = "../software-quality"
 
 如果质量配方在独立 Git 仓库，把 `source` 换为 `git`、完整 `rev` 和 `subdir`。然后在应用的 `BUILD_PROMPT.md` 写清 `quality` 约束应用到哪些部分、依赖只提供什么规则，以及如何验收。运行 `recipkg pack <app-recipe> -o <name>-<version>.recipe.tar.gz` 后，依赖会固定在 `.deps/quality/`；生成提示词包含它的完整 Markdown 内容。子模块适合需要同时开发/检出两个源码仓库的工作区，不是让 Agent 获得提示词依赖的必需条件。
 
+## 搜索其他配方
+
+发布 Recipkg 配方的 GitHub 仓库必须添加 `recipkg` topic。保留已有标签，可使用：
+
+```sh
+gh repo edit owner/repo --add-topic recipkg
+recipkg search
+recipkg search "quality" --limit 10
+recipkg search "quality" --json
+```
+
+`search` 显式访问 GitHub 的公开仓库搜索，按 `topic:recipkg` 筛选，可用 `GH_TOKEN` 或 `GITHUB_TOKEN` 提高请求额度。关键词按普通文本处理；`--limit` 为 1–100，默认 20。JSON 输出是候选数组，含 `repository`、`url`、`description`、`default_branch`；诊断与不完整结果警告写到 stderr。标签不是有效性或信任证明：必须查看实际 `RECIPE.md`、配方子目录、许可证和版本，再用完整提交固定依赖。搜索不会下载实现、安装包或运行内容；没有结果也正常成功，网络失败明确报错。
+
+## 语言
+
+五个提示词动作默认使用英文模板，`--lang zh-CN` 选择简体中文，`--lang en` 显式选择英文，例如：
+
+```sh
+recipkg build recipes/recipkg --lang en
+recipkg build recipes/recipkg --lang zh-CN
+```
+
+语言选项只选择任务模板；根配方、递归依赖、用户要求和自定义模板的原文保持不变，不自动翻译或改写锁定材料。CLI 帮助、诊断和协议标识使用英文。内置公开技能提供中英说明；英文用户可从 [English guide](README.en.md) 和 [English specification](docs/SPEC.en.md) 开始。
+
 ## 包操作
 
 ```sh
@@ -114,7 +140,15 @@ recipkg remove my-app@0.1.0
 
 ## 同步技能
 
-唯一内置并可同步安装的技能是 `migrate-to-recipkg`。本仓库开发使用的构建、仓库管理和更新技能位于 `.agents/skills/`，属于项目级工具，不随 CLI 发布。
+内置并可同步安装的公开技能有三个，默认入口为英文，每个目录另有 `SKILL.zh-CN.md` 中文说明：
+
+| 技能 | 作用 |
+| --- | --- |
+| `migrate-to-recipkg` | 观察现有软件，整理完整配方与依赖 |
+| `rewrite-to-recipkg` | 观察、提取配方、建立规范仓库，再按配方重写并验收 |
+| `test-feedback` | 模拟目标用户实际走端到端路径，结合本项目和相关项目的 issue 合成需求 |
+
+本仓库开发使用的构建、仓库管理和更新技能位于 `.agents/skills/`，属于项目级工具，不随 CLI 发布。
 
 ```sh
 recipkg skills list
@@ -132,7 +166,7 @@ recipkg skills sync --dest /path/to/your-agent/skills
 ## 开发
 
 ```sh
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/src python3 -m unittest discover -s generated/tests -v
 ```
 
 贡献前请阅读 [AGENTS.md](AGENTS.md)。格式变更应同步更新规范、示例和 CLI 的行为验证。

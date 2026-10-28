@@ -5,6 +5,8 @@ description: Turn an existing software project into a Recipkg package of Markdow
 
 # 将现有软件迁移到 Recipkg
 
+[English](SKILL.md)
+
 ## 输入
 
 - 软件目录、Git 仓库或可观察产品。
@@ -36,7 +38,6 @@ description: Turn an existing software project into a Recipkg package of Markdow
 1. 按用户确认的布局定位目标仓库和输出目录。阅读适用的 `AGENTS.md`、README、许可证、构建清单、接口文档和现有验收材料；检查 Git 状态并保留用户改动。不要覆盖源码或已有目标目录。
 2. 使用 `recipkg extract <target>` 生成标准化观察提示词，并将其作为检查清单。该命令只打印提示词；Agent 仍须实际查看获准访问的源码或产品。
 3. 记录证据来源和范围：主要用户行为、输入输出、命令与 API、数据格式、错误、边界条件、运行环境和安全约束。区分直接观察、从测试或文档得出的事实、推断和未知项。已有测试只覆盖其实际断言的行为。
-4. 按已选布局用 `recipkg init <output> --name <package-name>` 创建软件配方骨架；同仓布局时将 `<output>` 放在源码仓库的 `recipes/<package-name>/`，子模块布局时将它放在工作区的 `recipes/<package-name>/`。完善 `RECIPE.md` 中的包信息与有效配方依赖，使用 `BUILD_PROMPT.md` 描述用户确认的语言偏好、国际化范围、目标平台、可观察行为、接口和实现约束，并在 `ACCEPTANCE.md` 写明可复现的输入、操作和预期结果。需要较长说明时可增加 Markdown 文件，并从入口文件明确链接或引用。
 4. 按已选布局用 `recipkg init <output> --name <package-name>` 创建软件配方骨架；同仓布局时将 `<output>` 放在源码仓库的 `recipes/<package-name>/`，子模块布局时将它放在工作区的 `recipes/<package-name>/`。完善 `RECIPE.md` 中的包信息与有效配方依赖，使用 `BUILD_PROMPT.md` 描述用户确认的语言偏好、国际化范围、目标平台、设计方向、代码质量、性能预算、可观察行为、接口和实现约束，并在 `ACCEPTANCE.md` 写明可复现的输入、操作和预期结果。需要较长说明时可增加 Markdown 文件，并从入口文件明确链接或引用。
 5. 画出必要依赖图。需要由 Agent 一起重建的软件组件各自写成配方，并以递归依赖声明；普通源码仓库不是有效配方来源。操作系统、编译器、账号、数据集和远程服务等外部前提要单独写明，不能伪装成已打包依赖。无法确定的依赖或行为保留为明确问题，不要静默省略。
 6. 从文档、测试和可运行实例提炼验收场景，覆盖关键成功路径、失败行为、边界条件和依赖集成。有 UI 时验收布局层级、关键状态、窄屏与可访问性；记录性能基线的 workload、设备、命令和统计口径，不编造目标或结果。只在实际运行后记录检查结果；未运行的检查标记为未验证。除非迁移范围包含基线运行，否则不要为推断结果而改动原项目。
@@ -44,4 +45,12 @@ description: Turn an existing software project into a Recipkg package of Markdow
 
 ## 输出
 
+GitHub 上发布 Recipkg 配方的仓库必须添加 `recipkg` topic，并保留其他已有 topic。发布在当前授权范围内时可用 `gh repo edit <owner/repo> --add-topic recipkg` 设置并回读确认；只创建本地仓库时将此项列为发布前检查。标签用于 `recipkg search` 发现候选，不代替配方检查或固定提交。
+
 交付配方目录和可选的 `.recipe.tar.gz`，并简要列出用户确认的语言、自由描述中的目标、国际化范围、目标平台、仓库布局、来源版本、已覆盖的行为、递归依赖、外部前提、推断项及未运行的验收。打包和生成提示词只证明材料能被 Recipkg 解析与交付，不证明未来重建已经成功。
+
+## 生成源码的位置
+
+配方是主要输入，生成的实现源码默认放在 `generated/`，不再套实现名称目录；需要独立版本管理时直接将该目录作为固定提交的源码子模块。观察用的 `source/` 与生成实现分开；只有当前任务已授权发布时才创建远端和推送，否则先完成本地实现并记录未发布状态。
+
+保留项目与主仓库的原名，不追加 `-recipkg`。源码仓库若独立管理，名称使用全小写和连字符。
