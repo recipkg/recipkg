@@ -1,18 +1,53 @@
-# Recipkg
+<p align="center">
+  <img src="assets/recipkg-mark.svg" width="80" alt="Recipkg logo">
+</p>
 
-<img src="assets/recipkg-mark.svg" width="96" alt="Recipkg logo">
+<h1 align="center">Recipkg</h1>
 
-**Give the agent a recipe for the software.** Recipkg manages software reconstruction prompts, recursive dependencies, and Agent Skills. Recipe packages contain UTF-8 Markdown files only.
+<p align="center"><strong>Maintain the recipe. Let an agent rebuild the software.</strong></p>
 
-[中文](README.md) · [Format specification](docs/SPEC.en.md) · [Project philosophy](docs/PHILOSOPHY.md)
+<p align="center">
+  <a href="README.md">中文</a> ·
+  <a href="https://github.com/recipkg/standard-library">Standard library</a> ·
+  <a href="docs/SPEC.en.md">Specification</a> ·
+  <a href="docs/PHILOSOPHY.md">Philosophy</a> ·
+  <a href="docs/SKILLS.md">Skill repositories</a>
+</p>
 
-The project's vision is to preserve enough intent for future AI systems to reconstruct software. The current CLI has a narrower, explicit role: its five primary actions render standardized prompts. It does not call a model, execute generated software, or guarantee reconstruction from an incomplete description.
+![Software and dependencies become a recipe for rebuilding software](assets/recipkg-cover.png)
+
+From machine code to assembly to high-level languages, software has repeatedly packaged complexity into forms people can maintain. Recipkg explores another step: **keep behavior, constraints, dependencies, and acceptance criteria in an evolving recipe**. As models improve, an agent can use that same recipe to create a new implementation.
+
+Recipes are Markdown. Recipkg organizes them, collects recursive dependencies, and renders a complete prompt. Your chosen agent observes, implements, and verifies the software. The CLI does not call a model or execute generated software; actual acceptance tests determine whether a recipe is sufficient.
+
+```mermaid
+flowchart LR
+    A[Existing software] -->|extract| B[Markdown recipe]
+    D[Recursive dependencies] --> B
+    B -->|build prompt| C[Agent rebuild and verification]
+    C -->|feedback and iteration| B
+```
+
+**Start here:** [Install](#install) · [Try the example](#try-the-recursive-example) · [Five actions](#five-prompt-actions) · [Recipe format](#recipe-format) · [Skills](#skills) · [Development](#development)
+
+## Why recipes?
+
+Requirements, behavior, and acceptance criteria can outlast a particular implementation. Keep them with their dependencies, edit the prompts directly, reuse existing capabilities, and choose whether to evolve an implementation or rebuild it.
+
+| Your goal | What Recipkg prepares |
+| --- | --- |
+| Understand and preserve software | A task to extract its behavior, dependencies, and acceptance criteria |
+| Build or rewrite | A complete prompt with every recursive recipe |
+| Share and reuse | Checkable Markdown recipe packages with pinned dependencies |
+| Give an agent a project workflow | Project skills in independent repositories |
+
+The standard library is extracting recipes from open-source projects across CLI, collaboration, communication, and agents. Each recipe records its evidence and gaps. [Browse the standard library →](https://github.com/recipkg/standard-library)
 
 ## Install
 
 Python 3.11 or newer is required. The runtime uses the Python standard library; Git dependencies require the system Git executable.
 
-Clone with `git clone --recurse-submodules https://github.com/recipkg/recipkg.git`. Recipes, specifications, and public skills are the primary input; the replaceable CLI source is pinned as the `generated/cli-source/` submodule from its own repository. Existing checkouts should run `git submodule update --init --recursive`.
+Clone with `git clone --recurse-submodules https://github.com/recipkg/recipkg.git`. Recipes, specifications, and public skills are the primary input; the replaceable CLI source is pinned as the `generated/cli-source/` submodule from its own repository. Do not ignore `generated/`: the parent repository tracks the submodule pointers. Existing checkouts should run `git submodule update --init --recursive`.
 
 From this checkout:
 
@@ -157,6 +192,16 @@ recipkg skills sync --dest /path/to/your-agent/skills
 
 Synchronization includes built-in skills, installed skill packages, and skills embedded in installed packages as `skills/<name>/SKILL.md`. Choose a directory supported by your agent. Only managed files are synchronized; repeated runs are idempotent, and local edits or conflicting files are not overwritten.
 
+The CLI worktree also has a project-skill submodule command in development. It is not yet included in the CLI version pinned by this repository. When using that development worktree, point `--project` at the Git root (or omit it for the current directory):
+
+```sh
+recipkg skills project add https://github.com/recipkg/migrate-to-recipkg.git --name migrate-to-recipkg --rev <full-commit> --project /path/to/project
+recipkg skills project list --project /path/to/project
+recipkg skills project update migrate-to-recipkg --rev <full-commit> --project /path/to/project
+```
+
+Replace the example revision with a reviewed full commit. Add and update stage the gitlink for review and commit; they refuse dirty submodules and checked-out local branches. Skill submodules are not included in Markdown recipe archives, and their scripts are not executed.
+
 Create a skill recipe with `recipkg init my-skill --name my-skill --kind skill`. Its manifest uses `kind = "skill"` and `entry = "SKILL.md"`. Standard YAML `name` and `description` frontmatter remains in `SKILL.md`; TOML configures the package, not the skill format.
 
 ## What “zero code” means
@@ -164,6 +209,10 @@ Create a skill recipe with `recipkg init my-skill --name my-skill --kind skill`.
 Every archive payload file is UTF-8 Markdown with a `.md` suffix. Recipe packages do not carry implementation source files, binaries, filesystem links, or executable hooks. The manager and generated software can contain code. The package protocol is independent of their implementation language or model provider.
 
 Markdown may contain declarative configuration, interface descriptions, and input/output examples. File validation cannot prove that arbitrary natural-language content is sufficient for reconstruction, or that code has not been disguised as prose.
+
+<p align="center">
+  <img src="assets/recipkg-meme.png" width="420" alt="A hand-drawn recipe machine assembles dependencies into a build prompt for an agent">
+</p>
 
 ## Development
 

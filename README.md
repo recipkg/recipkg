@@ -1,20 +1,53 @@
-# Recipkg · 构方
+<p align="center">
+  <img src="assets/recipkg-mark.svg" width="80" alt="Recipkg 标志">
+</p>
 
-<img src="assets/recipkg-mark.svg" width="96" alt="Recipkg logo">
+<h1 align="center">Recipkg · 构方</h1>
 
-**把软件的配方交给 Agent。** Recipkg 管理软件重建提示词、递归依赖和 Agent 技能；软件配方包只包含 UTF-8 Markdown 文件。
+<p align="center"><strong>维护软件的配方，让 Agent 重建软件。</strong></p>
 
-[English](README.en.md) · [包格式](docs/SPEC.md) · [设计理念](docs/PHILOSOPHY.md) · [组织命名](docs/ORGANIZATION.md)
+<p align="center">
+  <a href="README.en.md">English</a> ·
+  <a href="https://github.com/recipkg/standard-library">标准库</a> ·
+  <a href="docs/SPEC.md">包规范</a> ·
+  <a href="docs/PHILOSOPHY.md">设计理念</a> ·
+  <a href="docs/SKILLS.md">技能仓库</a>
+</p>
 
-> 别写软件了，写提示词吧，未来的人工智能会完整重建它！
+![软件与依赖汇聚成配方，再由配方重建软件](assets/recipkg-cover.png)
 
-这是项目愿景。当前 CLI 的五个主要动作只生成标准化提示词，由你选择的 Agent 完成分析、实现与验收。CLI 不调用模型，不执行生成的软件，也不保证任意软件都能从有限说明中完整重建。
+软件从机器码、汇编到高级语言，一直在把复杂实现封装成更容易维护的表达。Recipkg 想再向前走一步：**把软件的行为、约束、依赖和验收条件写成可以持续迭代的配方**。模型进步后，同一套配方可以再次交给 Agent，生成新的实现。
+
+配方是 Markdown；Recipkg 负责组织配方、收集递归依赖和生成完整提示词。你选择的 Agent 负责观察、实现与验收。当前 CLI 不调用模型，也不执行生成的软件；配方是否足够重建，必须通过实际验收检验。
+
+```mermaid
+flowchart LR
+    A[现有软件] -->|extract 提取| B[Markdown 配方]
+    D[递归依赖] --> B
+    B -->|build 生成提示词| C[Agent 重建与验收]
+    C -->|反馈与迭代| B
+```
+
+**从这里开始：** [安装](#安装) · [运行示例](#先跑一个递归示例) · [五个动作](#五个主要动作) · [配方格式](#配方长什么样) · [项目技能](#同步技能) · [开发](#开发)
+
+## 为什么是配方？
+
+需求、行为和验收条件往往比某一代代码更值得长期维护。把它们和依赖一起保存，就能直接修改提示词、复用已有能力，再选择继续迭代实现或从头重建。
+
+| 你要做的事 | Recipkg 帮你准备什么 |
+| --- | --- |
+| 理解并保留现有软件 | 提取软件行为、依赖和验收条件的任务 |
+| 构建或重写 | 包含全部递归配方的完整提示词 |
+| 分享和复用 | 可检查、锁定版本的 Markdown 配方包 |
+| 让 Agent 按项目方法工作 | 项目级技能和独立技能仓库 |
+
+标准库正在从开源项目提取配方，覆盖命令行、协作、通讯和 Agent 等方向；每份配方都记录已验证内容与缺口。[浏览标准库 →](https://github.com/recipkg/standard-library)
 
 ## 安装
 
 需要 Python 3.11 或更新版本。运行时仅依赖 Python 标准库；解析 Git 依赖时需要系统 Git。
 
-克隆本仓库：`git clone --recurse-submodules https://github.com/recipkg/recipkg.git`。配方、规范和技能是主要输入，生成的 CLI 源码由独立仓库 `recipkg/cli-source` 管理，在 `generated/cli-source/` 以子模块引用。
+克隆本仓库：`git clone --recurse-submodules https://github.com/recipkg/recipkg.git`。配方、规范和技能是主要输入，生成的 CLI 源码由独立仓库 `recipkg/cli-source` 管理，在 `generated/cli-source/` 以子模块引用。不要忽略 `generated/`：父仓库需要跟踪其中的子模块指针。
 
 在本仓库目录执行：
 
@@ -159,11 +192,25 @@ recipkg skills sync --dest /path/to/your-agent/skills
 
 同步包括内置技能、已安装的技能包，以及已安装包中 `skills/<name>/SKILL.md` 形式的内嵌技能。使用你所选 Agent 支持的技能目录；不同 Agent 的目录发现规则由各自实现决定。Recipkg 只管理自己同步的文件，重复同步保持一致，遇到用户修改或冲突会拒绝覆盖。
 
+当前开发中的 CLI 源码还提供项目技能子模块命令，可用固定提交管理包含脚本与资源的完整技能。该功能尚未包含在主仓库目前固定的 CLI 版本中；使用开发工作树时，`--project` 指向项目 Git 根目录，不指定则使用当前目录：
+
+```sh
+recipkg skills project add https://github.com/recipkg/migrate-to-recipkg.git --name migrate-to-recipkg --rev <完整提交号> --project /path/to/project
+recipkg skills project list --project /path/to/project
+recipkg skills project update migrate-to-recipkg --rev <完整提交号> --project /path/to/project
+```
+
+替换示例中的提交号。添加和更新暂存 gitlink，需由项目维护者审查并提交；有本地改动或检出本地分支时拒绝更新。子模块不进入 Markdown 配方归档，也不执行技能脚本。
+
 创建技能配方用 `recipkg init my-skill --name my-skill --kind skill`。`RECIPE.md` 中使用 `kind = "skill"` 和 `entry = "SKILL.md"`；`SKILL.md` 仍保留 Agent Skills 标准的 YAML `name`、`description` 文件头。TOML 只负责包配置。
 
 ## 0 代码的范围
 
 `.recipe.tar.gz` 的每个文件必须是 UTF-8 `.md`。包内不含实现源文件、二进制、文件系统链接或执行钩子。工具本身和 Agent 生成的软件可以由代码实现；包协议不绑定实现语言或模型厂商。Markdown 允许配置块、接口说明和输入输出样例，文件检查不会自动证明提示词在语义上足够完整。
+
+<p align="center">
+  <img src="assets/recipkg-meme.png" width="420" alt="手绘的配方机器将依赖整理为交给 Agent 的构建提示词">
+</p>
 
 ## 开发
 
