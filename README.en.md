@@ -192,7 +192,7 @@ recipkg skills sync --dest /path/to/your-agent/skills
 
 Synchronization includes built-in skills, installed skill packages, and skills embedded in installed packages as `skills/<name>/SKILL.md`. Choose a directory supported by your agent. Only managed files are synchronized; repeated runs are idempotent, and local edits or conflicting files are not overwritten.
 
-The CLI worktree also has a project-skill submodule command in development. It is not yet included in the CLI version pinned by this repository. When using that development worktree, point `--project` at the Git root (or omit it for the current directory):
+The CLI also manages complete project skills as pinned submodules. Point `--project` at the Git root, or omit it for the current directory:
 
 ```sh
 recipkg skills project add https://github.com/recipkg/migrate-to-recipkg.git --name migrate-to-recipkg --rev <full-commit> --project /path/to/project

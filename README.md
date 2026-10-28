@@ -192,7 +192,7 @@ recipkg skills sync --dest /path/to/your-agent/skills
 
 同步包括内置技能、已安装的技能包，以及已安装包中 `skills/<name>/SKILL.md` 形式的内嵌技能。使用你所选 Agent 支持的技能目录；不同 Agent 的目录发现规则由各自实现决定。Recipkg 只管理自己同步的文件，重复同步保持一致，遇到用户修改或冲突会拒绝覆盖。
 
-当前开发中的 CLI 源码还提供项目技能子模块命令，可用固定提交管理包含脚本与资源的完整技能。该功能尚未包含在主仓库目前固定的 CLI 版本中；使用开发工作树时，`--project` 指向项目 Git 根目录，不指定则使用当前目录：
+CLI 还提供项目技能子模块命令，可用固定提交管理包含脚本与资源的完整技能。`--project` 指向项目 Git 根目录，不指定则使用当前目录：
 
 ```sh
 recipkg skills project add https://github.com/recipkg/migrate-to-recipkg.git --name migrate-to-recipkg --rev <完整提交号> --project /path/to/project

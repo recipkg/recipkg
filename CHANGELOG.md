@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `skills project add/list/update` for complete project-owned skills pinned as Git submodules; scripts and resources remain outside Markdown recipe archives.
 - Added explicit GitHub discovery with `recipkg search`; recipe repositories must carry the `recipkg` topic.
 - Added public `test-feedback` and `rewrite-to-recipkg` skills with English and Simplified Chinese documentation.
 - Added English prompt templates (now the default) and `--lang en|zh-CN`; recipe and custom-template bytes remain unchanged.

@@ -264,3 +264,5 @@ GitHub 上发布 Recipkg 配方的仓库必须有 `recipkg` topic。保留其他
 英文说明见 [SPEC.en.md](SPEC.en.md)。
 
 每个项目技能各有一个 canonical GitHub 仓库，项目通过固定提交的 Git 子模块引用（见 [SKILLS.md](SKILLS.md)），迁移项目引用同一组仓库。Git 工作区的 `.git` 元数据忽略且不进配方归档。`skills sync` 只为非 Git 目标生成托管副本，不等于创建子模块。
+
+`skills project list/add/update` 管理 Git 项目内 `.agents/skills/` 的完整技能子模块；添加和更新要求完整提交号，暂存元数据和 gitlink 但不提交，不执行技能或递归拉取其子模块。检查目标路径、技能入口及本地修改，拒绝覆盖冲突。添加前若目标被 Git 忽略则报错；可获取的固定提交不依赖远端默认分支。Git 操作隔离可能重定向仓库与索引的继承环境变量。若 Git 失败且注册状态或内容已改变，则保留现场并提示检查；只有可确认未修改且未登记的本次检出可被清理。

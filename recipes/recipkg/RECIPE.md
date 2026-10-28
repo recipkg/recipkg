@@ -7,7 +7,7 @@ format = "recipkg/1"
 
 [package]
 name = "recipkg"
-version = "0.1.0"
+version = "0.1.1"
 kind = "software"
 description = "管理纯 Markdown 软件配方、递归依赖和 Agent 技能的提示词生成 CLI。"
 entry = "BUILD_PROMPT.md"

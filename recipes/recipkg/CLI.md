@@ -57,6 +57,11 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 | --- | --- |
 | `skills list` | 按名称稳定排序列出全部可同步技能。 |
 | `skills sync --dest <directory>` | 必须显式指定目标，检查冲突后同步托管技能。 |
+| `skills project list --project <directory>` | 在 Git 项目中列出 `.agents/skills/` 下的技能子模块、来源和固定提交；不联网。 |
+| `skills project add <url> --name <name> --rev <commit> --project <directory>` | 把完整技能仓库固定到 `.agents/skills/<name>/` 子模块；只接受完整提交号，保留项目现有内容。 |
+| `skills project update <name> --rev <commit> --project <directory>` | 将已登记且干净的技能子模块更新到指定完整提交；不覆盖本地改动。 |
+
+项目技能的 Git 子模块可以包含脚本、资源和其他文件，不进入纯 Markdown 配方归档，也不执行技能内容。项目由 Git 的 `.gitmodules` 与 gitlink 记录来源和固定提交；项目自身技能和共享技能均可管理。`--project` 默认当前目录且须为 Git 工作树根；来源为无凭据 HTTPS URL 或本机绝对路径，`--rev` 为完整的 40 位小写提交号。添加和更新会暂存相应 gitlink，但不提交。操作检查目标路径、Git 状态、名称、来源、提交和技能入口；碰撞、未提交改动、分支检出和不一致的子模块应拒绝。网络访问仅在显式添加或更新时发生。新建及更新子模块不得执行 hooks、过滤器或递归拉取嵌套子模块。
 
 技能来源有三种：本工具内置的 `migrate-to-recipkg`、`rewrite-to-recipkg`、`test-feedback`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。所有技能来源同步时移除技能根部 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
 
