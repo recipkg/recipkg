@@ -37,7 +37,7 @@ Give `hello-build.md` to your chosen agent. The prompt includes the root recipe 
 
 ## Reconstruct Recipkg itself
 
-`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, five templates, and six skills.
+`recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, five templates, and one bundled skill.
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -82,7 +82,16 @@ source = "../greeting"
 
 Describe behavior, interfaces, constraints, and environment requirements in the entry document. Define observable acceptance criteria in `ACCEPTANCE.md`. A generated scaffold still needs substantive specifications before it can support reconstruction.
 
-Dependencies may use relative paths, HTTPS recipe archives, or Git repositories pinned to full 40-character commit hashes. A Git `subdir` selects a recipe directory. A source-code repository without a recipe must first be converted into one. See the [format specification](docs/SPEC.md).
+Dependencies may use relative paths, HTTPS recipe archives, or Git repositories pinned to full 40-character commit hashes. A Git `subdir` selects a recipe directory. A source-only repository or ordinary prompt document must first be converted into a Recipkg recipe. A dependency does not need to be a Git submodule: `recipkg pack` collects its recursive Markdown content from the pinned source and records it in the lock file. The root build prompt must still state each dependency alias's role, scope, and acceptance contract. See the [format specification](docs/SPEC.md).
+
+For example, a recipe in the same workspace can depend on the shared quality recipe:
+
+```toml
+[dependencies.quality]
+source = "../software-quality"
+```
+
+For an independent repository, use `git`, a reviewed full commit hash in `rev`, and `subdir`. Then describe in the root `BUILD_PROMPT.md` where the `quality` contract applies and how to verify it. `recipkg pack` vendors the dependency under `.deps/quality/`, so consumers receive the full Markdown context. Use a Git submodule only when developers need both repositories checked out together.
 
 ## Package operations
 
@@ -103,7 +112,7 @@ The default store is `$XDG_DATA_HOME/recipkg`, falling back to `~/.local/share/r
 
 ## Skills
 
-Six skills are included: `software-to-prompt`, `prompt-to-software`, `rewrite-software`, `add-dependency`, `discover-dependencies`, and `migrate-to-recipkg`.
+The only bundled, syncable skill is `migrate-to-recipkg`. Development skills for building packages, managing Git repositories, and updating Recipkg are project-level tools under `.agents/skills/` and are not shipped by the CLI.
 
 ```sh
 recipkg skills list

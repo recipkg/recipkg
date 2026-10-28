@@ -36,8 +36,7 @@ class SkillSynchronizationTests(unittest.TestCase):
 
     def test_listing_does_not_create_a_store(self) -> None:
         names = list_skills(self.home)
-        self.assertEqual(len(names), 5)
-        self.assertIn("software-to-prompt", names)
+        self.assertEqual(names, ["migrate-to-recipkg"])
         self.assertFalse(self.home.exists())
 
     def test_required_metadata_accepts_a_folded_description(self) -> None:
@@ -54,10 +53,10 @@ class SkillSynchronizationTests(unittest.TestCase):
             validate_skill(skill)
 
     def test_sync_refuses_a_preexisting_unowned_skill(self) -> None:
-        target = self.destination / "software-to-prompt"
+        target = self.destination / "migrate-to-recipkg"
         target.mkdir(parents=True)
         document = target / "SKILL.md"
-        original = b"# My existing software-to-prompt skill\n"
+        original = b"# My existing migrate-to-recipkg skill\n"
         document.write_bytes(original)
         with self.assertRaises(RecipeError):
             sync_skills(self.home, self.destination)
@@ -99,7 +98,7 @@ class SkillSynchronizationTests(unittest.TestCase):
         document.write_bytes(original)
         sync_skills(self.home, self.destination)
         self.assertFalse(document.parent.exists())
-        self.assertTrue((self.destination / "software-to-prompt" / "SKILL.md").exists())
+        self.assertTrue((self.destination / "migrate-to-recipkg" / "SKILL.md").exists())
 
     def test_identical_skill_versions_deduplicate_but_different_bodies_conflict(self) -> None:
         self.installed_skill(version="0.1.0")

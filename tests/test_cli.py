@@ -17,11 +17,6 @@ import unittest
 
 REPOSITORY = Path(__file__).resolve().parents[1]
 BUILTIN_SKILLS = {
-    "software-to-prompt",
-    "prompt-to-software",
-    "rewrite-software",
-    "add-dependency",
-    "discover-dependencies",
     "migrate-to-recipkg",
 }
 
@@ -244,7 +239,7 @@ class CLIAcceptanceTests(unittest.TestCase):
         first_sync = snapshot(destination)
         self.cli("skills", "sync", "--dest", destination)
         self.assertEqual(snapshot(destination), first_sync)
-        edited = destination / "software-to-prompt" / "SKILL.md"
+        edited = destination / "migrate-to-recipkg" / "SKILL.md"
         edited.write_text(edited.read_text(encoding="utf-8") + "\nUser-owned customization.\n", encoding="utf-8")
         before_conflict = snapshot(destination)
         self.cli("skills", "sync", "--dest", destination, success=False)

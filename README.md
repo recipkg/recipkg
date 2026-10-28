@@ -39,7 +39,7 @@ recipkg build hello-0.1.0.recipe.tar.gz --output hello-build.md
 
 ## 重建 Recipkg 自身
 
-`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、五个模板和六个技能。可以把它作为第一个正式配方包：
+`recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、五个模板和一个内置技能。可以把它作为第一个正式配方包：
 
 ```sh
 recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
@@ -84,7 +84,16 @@ source = "../greeting"
 
 在 `BUILD_PROMPT.md` 中写明行为、接口、环境和约束，在 `ACCEPTANCE.md` 中写出可观察的验收条件。声明了依赖后，其来源必须实际包含有效配方。`init` 生成的是待完善的骨架，不是已经证明可重建的软件规格。
 
-依赖支持相对路径、HTTPS 配方归档，或固定到完整 40 位提交号的 Git 仓库。Git 仓库可以用 `subdir` 指定配方目录；只有源码的仓库需要先提炼成配方。详见[包格式](docs/SPEC.md)。
+依赖支持相对路径、HTTPS 配方归档，或固定到完整 40 位提交号的 Git 仓库。Git 仓库可以用 `subdir` 指定配方目录；只有源码或普通提示词的仓库需要先整理成 Recipkg 配方。普通依赖不要求做成 Git 子模块：`recipkg pack` 会按固定来源收集递归 Markdown 内容并写入锁文件；构建提示词仍需明确写出每个依赖别名的职责、适用范围和验收方式。详见[包格式](docs/SPEC.md)。
+
+例如在同一工作区复用本仓库的质量配方，可在应用的 `RECIPE.md` 中声明：
+
+```toml
+[dependencies.quality]
+source = "../software-quality"
+```
+
+如果质量配方在独立 Git 仓库，把 `source` 换为 `git`、完整 `rev` 和 `subdir`。然后在应用的 `BUILD_PROMPT.md` 写清 `quality` 约束应用到哪些部分、依赖只提供什么规则，以及如何验收。运行 `recipkg pack <app-recipe> -o <name>-<version>.recipe.tar.gz` 后，依赖会固定在 `.deps/quality/`；生成提示词包含它的完整 Markdown 内容。子模块适合需要同时开发/检出两个源码仓库的工作区，不是让 Agent 获得提示词依赖的必需条件。
 
 ## 包操作
 
@@ -105,7 +114,7 @@ recipkg remove my-app@0.1.0
 
 ## 同步技能
 
-内置技能：`software-to-prompt`、`prompt-to-software`、`rewrite-software`、`add-dependency`、`discover-dependencies`、`migrate-to-recipkg`。
+唯一内置并可同步安装的技能是 `migrate-to-recipkg`。本仓库开发使用的构建、仓库管理和更新技能位于 `.agents/skills/`，属于项目级工具，不随 CLI 发布。
 
 ```sh
 recipkg skills list

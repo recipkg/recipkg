@@ -58,7 +58,7 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 | `skills list` | 按名称稳定排序列出全部可同步技能。 |
 | `skills sync --dest <directory>` | 必须显式指定目标，检查冲突后同步托管技能。 |
 
-技能来源有三种：本工具内置的六个技能、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。独立技能包同步时移除根 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
+技能来源有三种：本工具内置的 `migrate-to-recipkg`、已安装 `kind = "skill"` 配方、已安装包中的 `skills/<name>/SKILL.md`。开发辅助技能属于源码仓库的 `.agents/skills/`，不随 CLI 安装或同步。独立技能包同步时移除根 `RECIPE.md` 与根 `LOCK.md` 容器元数据，其余纯 Markdown 材料保留。内嵌技能目录的名称须与其 YAML `name` 一致。
 
 同名同内容可以合并；同名不同内容失败。技能的 `name` 和 `description` 必须是有效 YAML 字符串，保留原始文件。支持普通、单引号、双引号及常用块标量写法；名字遵守协议名称规则，描述非空且最长 1024 字符。
 
@@ -68,4 +68,4 @@ HTTPS 来源必须无内嵌账号密码和 fragment，不能降级到 HTTP。Git
 
 ## 资源与分发
 
-安装后的工具必须自带五个模板与六个技能，离开源码 checkout 仍能运行。包格式、提示词格式与生成软件语言没有绑定。各命令帮助应解释“输出提示词”和“执行任务”的区别。
+安装后的工具必须自带五个模板与唯一内置技能 `migrate-to-recipkg`，离开源码 checkout 仍能运行。包格式、提示词格式与生成软件语言没有绑定。各命令帮助应解释“输出提示词”和“执行任务”的区别。
