@@ -14,7 +14,7 @@
   <a href="docs/SKILLS.md">技能仓库</a>
 </p>
 
-![软件与依赖汇聚成配方，再由配方重建软件](assets/recipkg-cover.png)
+![现有软件与依赖汇入配方，Agent 重建软件，并把迭代反馈带回配方](assets/recipkg-workflow.png)
 
 软件从机器码、汇编到高级语言，一直在把复杂实现封装成更容易维护的表达。Recipkg 想再向前走一步：**把软件的行为、约束、依赖和验收条件写成可以持续迭代的配方**。模型进步后，同一套配方可以再次交给 Agent，生成新的实现。
 
@@ -207,10 +207,6 @@ recipkg skills project update migrate-to-recipkg --rev <完整提交号> --proje
 ## 0 代码的范围
 
 `.recipe.tar.gz` 的每个文件必须是 UTF-8 `.md`。包内不含实现源文件、二进制、文件系统链接或执行钩子。工具本身和 Agent 生成的软件可以由代码实现；包协议不绑定实现语言或模型厂商。Markdown 允许配置块、接口说明和输入输出样例，文件检查不会自动证明提示词在语义上足够完整。
-
-<p align="center">
-  <img src="assets/recipkg-meme.png" width="420" alt="手绘的配方机器将依赖整理为交给 Agent 的构建提示词">
-</p>
 
 ## 开发
 

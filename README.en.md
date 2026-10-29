@@ -14,7 +14,7 @@
   <a href="docs/SKILLS.md">Skill repositories</a>
 </p>
 
-![Software and dependencies become a recipe for rebuilding software](assets/recipkg-cover.png)
+![Existing software and dependencies become a recipe; an agent rebuilds the software and feeds iteration back](assets/recipkg-workflow.png)
 
 From machine code to assembly to high-level languages, software has repeatedly packaged complexity into forms people can maintain. Recipkg explores another step: **keep behavior, constraints, dependencies, and acceptance criteria in an evolving recipe**. As models improve, an agent can use that same recipe to create a new implementation.
 
@@ -209,10 +209,6 @@ Create a skill recipe with `recipkg init my-skill --name my-skill --kind skill`.
 Every archive payload file is UTF-8 Markdown with a `.md` suffix. Recipe packages do not carry implementation source files, binaries, filesystem links, or executable hooks. The manager and generated software can contain code. The package protocol is independent of their implementation language or model provider.
 
 Markdown may contain declarative configuration, interface descriptions, and input/output examples. File validation cannot prove that arbitrary natural-language content is sufficient for reconstruction, or that code has not been disguised as prose.
-
-<p align="center">
-  <img src="assets/recipkg-meme.png" width="420" alt="A hand-drawn recipe machine assembles dependencies into a build prompt for an agent">
-</p>
 
 ## Development
 
