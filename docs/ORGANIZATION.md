@@ -28,7 +28,7 @@ Recipkg 由 recipe 与 pkg 组合：管理软件的“配方包”。名称同�
 
 项目和主仓库保持原名 `recipkg`，不追加 `-recipkg`。发布配方的 GitHub 仓库必须有 `recipkg` topic；源码仓库若需独立管理，名称使用全小写、连字符，在 `generated/` 容器下用同名子目录作为固定提交子模块。所有项目技能也各自独立成仓库，用子模块引用相同上游。
 
-有明确需求后再建立独立的配方集合或文档站。第一版使用本地目录、HTTPS 配方归档和固定提交的 Git 仓库作为来源，不要求中央注册表。
+独立配方目录已建立于 [recipkg/standard-library](https://github.com/recipkg/standard-library)，按类别链接独立配方仓库及其覆盖状态；它不是中央注册表。文档站仍未作为交付承诺。第一版使用本地目录、HTTPS 配方归档和固定提交的 Git 仓库作为来源。项目当前验证与剩余边界见 [进度记录](PROGRESS.md)。
 
 ## 对外介绍
 

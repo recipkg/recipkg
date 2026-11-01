@@ -77,8 +77,8 @@ Give `hello-build.md` to your chosen agent. The prompt includes the root recipe 
 `recipes/recipkg/` describes this tool, including its CLI contract, package format, acceptance criteria, English/Chinese templates, and three bundled skills.
 
 ```sh
-recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
-recipkg build recipkg-0.1.0.recipe.tar.gz --output recipkg-build.md
+recipkg pack recipes/recipkg -o recipkg-0.1.1.recipe.tar.gz
+recipkg build recipkg-0.1.1.recipe.tar.gz --output recipkg-build.md
 ```
 
 Give the resulting prompt to an agent to request a new implementation. This repository's first reference CLI uses Python; the recipe permits other implementation languages. A reconstruction still needs to pass actual acceptance checks.
@@ -216,7 +216,7 @@ Markdown may contain declarative configuration, interface descriptions, and inpu
 RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -v
 ```
 
-Read [AGENTS.md](AGENTS.md) before contributing. Keep the format specification, examples, and observable CLI behavior aligned.
+Read [AGENTS.md](AGENTS.md) before contributing. Keep the format specification, examples, and observable CLI behavior aligned. See [project progress](docs/PROGRESS.md) for verified status, reproducible checks, and outstanding verification boundaries.
 
 ## License
 

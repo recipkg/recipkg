@@ -2,7 +2,7 @@
 
 ## 通用规则
 
-命令入口为 `recipkg`。`--help` 显示帮助并退出 0；`--version` 输出 `recipkg 0.1.0` 并退出 0。成功退出 0，参数、输入、文件或验证错误退出 2，并向 stderr 输出可理解的原因。向已关闭的管道输出不应产生用户可见堆栈。
+命令入口为 `recipkg`。`--help` 显示帮助并退出 0；`--version` 输出 `recipkg 0.1.1` 并退出 0。成功退出 0，参数、输入、文件或验证错误退出 2，并向 stderr 输出可理解的原因。向已关闭的管道输出不应产生用户可见堆栈。
 
 全局 `--home <directory>` 放在子命令前。安装仓库路径优先级为：`--home`、`RECIPKG_HOME`、`$XDG_DATA_HOME/recipkg`、`~/.local/share/recipkg`。不需要注册账号或模型凭据。
 

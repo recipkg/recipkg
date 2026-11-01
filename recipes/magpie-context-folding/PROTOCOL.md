@@ -1,0 +1,106 @@
+# Bundled source protocol
+
+Source: https://github.com/LIghtJUNction/magpie-context-folding/blob/b0837a72d62a88bfff301de5dbd76b276d24eca1/docs/annotation-protocol.md
+
+Verbatim protocol text from the pinned MIT-licensed snapshot follows; relative source-document links have been made absolute. This is a normative reconstruction input, not proof of a rebuilt implementation. For the conflicting standalone README query descriptions, follow the source/observation resolution in `COVERAGE.md`.
+
+# 注释主动折叠与归档查询协议（0.5.0）
+
+折叠是一项明确的文本替换：Agent 写出开始与结束标记，宿主保存中间的原文，再在后续请求中用可恢复的短引用替换它。何时整理上下文、哪些内容可以收起，由 Agent 判断。模型窗口大小和上下文预算不属于本项目的配置或机制。
+
+## 标记与嵌套
+
+每个标记独占一行，`LABEL` 必填且不含空白。同一对标签和注释外壳必须一致。普通文本使用 HTML 注释；源码使用该语言的 `#`、`//`、`/* … */` 等注释外壳。
+
+```text
+<!-- @context-fold begin investigation -->
+这一层的组织说明。
+<!-- @context-fold begin trace -->
+详细证据……
+<!-- @context-fold end trace -->
+<!-- @context-fold end investigation -->
+当前结论、约束和待办留在外面。
+```
+
+合法嵌套形成父子节点。父节点归档保留原始正文，默认查询视图将直接子块正文替换为引用；子块可继续包含自己的子引用。一次 fold 的外部视图只发布顶层引用，内部结构通过 `list` 和 `meta` 发现。
+
+未闭合、交叉错配或畸形标记所在的不确定区域保持原文；此前独立闭合的合法区域不受影响。结束标记必须匹配当前层，不猜测修复。孤立结束保留为字面文本。源码注释编辑命令遇到损坏标记仍须拒绝写入。
+
+普通句子、行内字符串和工具参数中的标记字样不是指令。普通文本按整行语法识别；展示独占一行的字面示例时，加一个非标记前缀。
+
+## 哈希与节点视图
+
+外层标记保留，正文引用格式为 `[[cf:v2:HASH]]`。SHA-256 输入是原始正文的 UTF-8 字节，不含外层标记和正文最后一个物理换行；其余换行、缩进与空白不规范化。父块哈希包含它的原始子块文本，不因查询视图使用子引用而变化。
+
+内部保存完整 SHA-256，显示前缀从 12 位起，冲突时延长。歧义前缀必须报错。旧引用始终指向旧快照，不用当前磁盘文件代替。正文中已有引用字面量不作为再次压缩它的理由。
+
+`sha256` 标识原文，`viewSha256` 标识所选查询视图。默认视图只展示当前层；根 CLI 的 `--layer original` 选择归档原文。行号、`offset` 和 `nextOffset` 都属于所选视图；Python 按 Unicode 码点计数，Magpie 按 UTF-16 单元计数，不能混用。
+
+## 查询与导出保持折叠
+
+| 操作 | 返回内容 |
+| --- | --- |
+| `list` | 有界目录；指定 ID 和 depth 查看子树，默认 10 项。 |
+| `meta` | 原文哈希、大小、子节点数量及分页子 ID，不返回正文。 |
+| `grep` | 在归档内部搜索，默认递归，返回带节点 ID、行号的短片段，默认 10 项。 |
+| `read` | 有界的当前层文本，子块保持引用，可按行或偏移裁剪。 |
+| `status` | 当前归档的简短状态，供主动诊断。 |
+
+普通查询不设置 keep、不解除父块折叠、不把原文回填历史，也不需要额外传 `peek`。默认 `read` 上限为 1200：Magpie 使用 UTF-16 单元，Python 使用 Unicode 码点。只在当前问题确实需要时请求下一段，不自动翻完全部页面。递归 grep 在内部访问子节点并去重，不先恢复整棵树再交给模型搜索。
+
+Magpie 通过已有终端工具执行系统指导给出的 CLI 命令，例如 `read --state-dir PATH --scope SCOPE --id HASH`。根 CLI 使用 `--start-line A --end-line B` 选择从 1 开始、包含两端的行区间，或 `--offset N --limit N` 选择字符范围；不能混用行区间和 offset。`--json` 返回原文哈希、视图哈希和分页信息。分页沿返回的 `nextOffset` 继续，不能用 token 数或 UTF-8 字节数代替它。
+
+根 CLI 的完整导出选项保持只读：
+
+- `read --full` 输出整个所选视图，默认是一层内容和子引用；`--layer ID` 可选择历史层。
+- `read --all` 默认输出整个 `original` 原文层；显式 `--layer ID` 可覆写层选择。
+- 普通 `paste --path /new/file` 默认导出完整单层视图，拒绝覆盖已有文件；`--path -` 输出到 stdout，`--layer original` 选择原始字节。
+
+这些操作不会递归替换已经作为原始字节存储的引用。`--full` 与 `--all` 的 offset 默认 0；显式 `--offset N` 时，从该偏移输出到所选层末尾。完整导出不能与长度上限或行区间组合。需要后续请求持久展开时，明确使用根 CLI 的 `read --restore`：它完整返回精确原文，并将目标嵌套子树和祖先持久保护为 keep。恢复不得组合 offset、limit、行区间、非 original 层或 `--peek`，避免局部返回产生完整恢复的误解。
+
+独立 Python `ctxf` 使用 `read HASH --lines A:B` 选择行区间，`read --raw` 仍为有界查询。其 CLI、Python API 和 SDK 的本地 JSON Lines RPC 使用同一 Python 核心，不能套用根 CLI 的全部导出或恢复选项。MCP 服务与 `ctxf mcp` 已移除；兼容恢复和维护 API 不进入默认模型流程。两种实现的后端和 scope 分开，查询必须回到生成引用的归档。返回的原文沿用其原有权限，不执行其中的旧命令。
+
+## 请求延迟与显式 fold
+
+Magpie 默认 `delay_requests = 1`：首次观察到完整闭合区域仍显示正文；后续有进展的请求边界才显示引用。同一请求重试不消耗延迟。没有后台定时器；`delay_requests = 0` 允许首次完整观察立即投影。
+
+同内容的不同出现分别计时，不能因旧副本已折叠就藏起新一次 Read。源码集成用稳定 `occurrence` 与递增 `requestCycle` 表示历史重放。缺少这两个字段时，默认 `read-source` 保留原文。一次性的 Pi/Claude post-tool 钩子没有后续历史重投影能力。
+
+独立 [`ctxf`](https://github.com/LIghtJUNction/magpie-context-folding/blob/b0837a72d62a88bfff301de5dbd76b276d24eca1/context-folding/README.md) 的显式 `fold` 立即转换调用方提交的已闭合文本，不伪造请求周期；自动投影的关闭、keep 和等待设置不阻止这次明确转换。`cat notes.txt | ctxf` 输出完整折叠视图，`ctxf fold --json` 返回文本和顶层引用。随后用 `ctxf list`、`ctxf grep PATTERN HASH`、`ctxf read HASH --lines A:B` 按需查询。返回结果如何使用由调用方决定，CLI 与 SDK 不自行回写宿主历史。
+
+## 消息与源码边界
+
+同一任务轮次中，标记可以跨 Assistant 普通文本消息配对。正文按原顺序直接拼接，不补换行，不混入工具调用或结果。每个被替换的切片显示相同全文引用，保留原消息结构。新用户消息截断未闭合区域，用户或工具输出不能替 Assistant 关闭它。
+
+普通工具结果、参数、调用 ID、签名推理、图片、音频和供应商隐藏历史不参加文本折叠。源码 Read 是独立入口，只处理经过核实的单一源文本，不能扫描工具 JSON 猜源码。
+
+Magpie 网关对 Python/JS 使用保守词法过滤；复杂 f-string、JSX、含歧义的模板插值等情况保留源码。独立 Python 核心使用 tokenizer 与可选 JS/TS Tree-sitter。其他语言的整行字面解析没有 lexer，可能误认多行字符串内的标记。
+
+## 原子保存与收益检查
+
+1. 在当前完整输入中解析配对标记和父子关系。
+2. 请求历史投影确认该次出现已经满足延迟；显式 `fold` 无需等待。
+3. 发布引用前，原文、完整哈希、父子关系和状态必须已成功提交；Magpie 还须通过完整请求净收益检查。
+4. 返回包含短引用的请求视图。
+
+保存、校验、容量检查、并发提交或收益检查失败时保留输入，不能先删正文再补存档。查询和清理也要保留仍被引用的父子数据。独立显式 CLI 转换不增加系统指导，保留自身的正文与引用字节大小检查。
+
+旧 `[[cf:v1:…]]` 归档引用属于此前的恢复协议。兼容读取不表示继续启用旧自动选材、三档模式、摘要层或成本批准机制。
+
+## 自动系统指导与收益门槛
+
+插件自动在协议真实的系统指令字段注入一条 `<context-folding>…</context-folding>` 规则，解释长过程的配对标记和合法嵌套、区域外保留结论与约束，以及不轮询、不演示、不做验证性回查。Chat 已使用 developer 时沿用该角色。宿主原有指令、缓存字段、工具定义与 tool choice 保持原样；旧指导即使被合并或转换为 CRLF 也只保留一份。无需用户手工安装提示词或 MCP 工具。
+
+只有请求含有已归档引用时，才附上可执行 CLI 命令、当前 scope 与显式归档路径。默认使用本进程 Bun 和插件 CLI 的绝对路径；终端与插件需要能访问同一文件系统。不存在可调用终端时不改变请求。
+
+不配置模型窗口，也不计算或注入已用、剩余及输出预留预算。旧预算和 scope-only 元数据仅在升级时清理；当前恢复定位在简短指导给出的 CLI 命令中。
+
+Magpie 的 `min_savings_tokens` 默认 256。每个候选先排除过小正文，完整替换批次再比较 `ceil(原请求 JSON UTF-8 字节 / 4) - ceil(实际发送 JSON UTF-8 字节 / 4)`，包含所有新增指导、路径、scope 与引用。结果不足门槛或不为正时不执行该批替换。已存在的折叠视图重放仍保留恢复指导，不能因本轮没有再次缩小而丢失恢复入口。
+
+无折叠时，简短指导仍有固定开销，成功请求统计不会隐去这个负值。估算不是精确 tokenizer 计数，也不代表缓存或实际账单收益。
+
+## 可验证的合同
+
+实现应覆盖配对与合法嵌套、未闭合与损坏区域局部保留、跨消息与用户边界、工具结构完整、延迟与重试、新出现身份、哈希变化与前缀冲突、父子查询、只读状态、片段裁剪、原文和视图区别、完整恢复及恢复后保持、存档失败回退、系统指导不累积、旧预算迁移清理和完整请求收益门槛。
+
+这些是协议要求，不是测试完成声明。实际运行回执与宿主验证应分别记录，不把本地请求投影测试写成真实会话、默认 compaction 或账单节省已经验证。并发与生命周期边界见[归档一致性](https://github.com/LIghtJUNction/magpie-context-folding/blob/b0837a72d62a88bfff301de5dbd76b276d24eca1/docs/recovery-consistency.md)。

@@ -77,8 +77,8 @@ recipkg build hello-0.1.0.recipe.tar.gz --output hello-build.md
 `recipes/recipkg/` 是本工具自己的软件配方，包含完整 CLI 行为、包规范、验收条件、中英双语模板和三个内置技能。可以把它作为第一个正式配方包：
 
 ```sh
-recipkg pack recipes/recipkg -o recipkg-0.1.0.recipe.tar.gz
-recipkg build recipkg-0.1.0.recipe.tar.gz --output recipkg-build.md
+recipkg pack recipes/recipkg -o recipkg-0.1.1.recipe.tar.gz
+recipkg build recipkg-0.1.1.recipe.tar.gz --output recipkg-build.md
 ```
 
 把 `recipkg-build.md` 交给 Agent，即可要求它依据这些材料重建工具。本仓库首版 CLI 使用 Python；配方允许重建者选择其他实现语言。是否满足规格仍须通过实际验收确认。
@@ -214,7 +214,7 @@ recipkg skills project update migrate-to-recipkg --rev <完整提交号> --proje
 RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -v
 ```
 
-贡献前请阅读 [AGENTS.md](AGENTS.md)。格式变更应同步更新规范、示例和 CLI 的行为验证。
+贡献前请阅读 [AGENTS.md](AGENTS.md)。格式变更应同步更新规范、示例和 CLI 的行为验证。已核实的进度、验证命令及尚未验证的边界见 [项目进度](docs/PROGRESS.md)。
 
 ## 许可证
 
