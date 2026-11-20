@@ -181,7 +181,7 @@ recipkg remove my-app@0.1.0
 | `rewrite-to-recipkg` | 观察、提取配方、建立规范仓库，再按配方重写并验收 |
 | `test-feedback` | 模拟目标用户实际走端到端路径，结合本项目和相关项目的 issue 合成需求 |
 
-全部 11 个项目技能各有一个独立 GitHub 仓库，以固定提交的子模块引用。3 个公开技能在 `recipes/recipkg/skills/`，8 个开发技能在 `.agents/skills/`；开发技能不作为 CLI 内置技能发布。迁移后的项目必须复用这些相同仓库作为技能子模块，不逐项目复制内容。[仓库与更新清单](docs/SKILLS.md)。
+全部 12 个项目技能各有一个独立 GitHub 仓库，以固定提交的子模块引用。3 个公开技能在 `recipes/recipkg/skills/`，9 个开发技能在 `.agents/skills/`；开发技能不作为 CLI 内置技能发布。迁移后的项目必须复用这些相同仓库作为技能子模块，不逐项目复制内容。[仓库与更新清单](docs/SKILLS.md)。
 
 `skills sync` 仍为不使用 Git 的目标生成托管副本，不会创建项目子模块，也不代替上述仓库引用。
 
