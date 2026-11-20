@@ -181,7 +181,7 @@ Three public skills ship with the CLI, with English entry points and `SKILL.zh-C
 | `rewrite-to-recipkg` | Observe, specify, establish a recipe repository, rebuild, and verify |
 | `test-feedback` | Run target-user end-to-end tasks and synthesize requirements from real tests and related issues |
 
-All 11 project skills have independent canonical GitHub repositories pinned as submodules: three public skills under `recipes/recipkg/skills/`, and eight development skills under `.agents/skills/`. Migrated projects must reuse the same repositories as skill submodules instead of copying text. Development skills are not CLI builtins. See the [repository catalog](docs/SKILLS.md).
+All 12 project skills have independent canonical GitHub repositories pinned as submodules: three public skills under `recipes/recipkg/skills/`, and nine development skills under `.agents/skills/`. Migrated projects must reuse the same repositories as skill submodules instead of copying text. Development skills are not CLI builtins. See the [repository catalog](docs/SKILLS.md).
 
 `skills sync` remains a managed-copy option for non-Git destinations; it does not create or replace project skill submodules.
 
