@@ -1,12 +1,13 @@
 # Project skill repositories / 项目技能仓库
 
-All eleven skills have their own canonical GitHub repositories. This project records reviewed commits as Git submodules; migrated projects reuse the same repositories, normally under `.agents/skills/<skill-name>/`. Public CLI skills and development skills remain separate roles, not separate copies of a skill.
+All twelve skills have their own canonical GitHub repositories. This project records reviewed commits as Git submodules; migrated projects reuse the same repositories, normally under `.agents/skills/<skill-name>/`. Public CLI skills and development skills remain separate roles, not separate copies of a skill.
 
 | Skill | Canonical repository | Checkout in this project |
 | --- | --- | --- |
 | `add-dependency` | [recipkg/add-dependency](https://github.com/recipkg/add-dependency) | `.agents/skills/add-dependency/` |
 | `build-software-package` | [recipkg/build-software-package](https://github.com/recipkg/build-software-package) | `.agents/skills/build-software-package/` |
 | `discover-dependencies` | [recipkg/discover-dependencies](https://github.com/recipkg/discover-dependencies) | `.agents/skills/discover-dependencies/` |
+| `maintain-recipkg-standard-library` | [recipkg/maintain-recipkg-standard-library](https://github.com/recipkg/maintain-recipkg-standard-library) | `.agents/skills/maintain-recipkg-standard-library/` |
 | `manage-git-repository` | [recipkg/manage-git-repository](https://github.com/recipkg/manage-git-repository) | `.agents/skills/manage-git-repository/` |
 | `migrate-to-recipkg` | [recipkg/migrate-to-recipkg](https://github.com/recipkg/migrate-to-recipkg) | `recipes/recipkg/skills/migrate-to-recipkg/` |
 | `prompt-to-software` | [recipkg/prompt-to-software](https://github.com/recipkg/prompt-to-software) | `.agents/skills/prompt-to-software/` |
