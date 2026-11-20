@@ -1,5 +1,25 @@
 # Project progress / 项目进度
 
+## 2026-11-20：文档与技能引用核对（本地）
+
+这次核对只覆盖 Recipkg 主仓库的 Markdown 链接、固定子模块引用和 CLI 单元测试；**不代表重新发布、重建所有配方，也不代表所有平台的端到端验收**。为避免覆盖其他工作，保留已有 `.pi/` 未跟踪目录及全部子模块内容，不更新锁定版本。
+
+- **源码边界：** 主仓库基线 `a76ae4a1580aa1918e30483acb6299d6d654b378`（检查时与 `origin/main` 一致）；CLI 源码子模块固定 `709ab44231000a31bae9b26fe05a017d4408fe20`。这两个提交分别是主仓库和 CLI 的复现入口，不以日期代替提交固定。
+- **技能结构：** `git ls-files -s` 实际列出 13 个 `160000` gitlink，其中 `.agents/skills/` 9 个、`recipes/recipkg/skills/` 3 个，另一个为 `generated/cli-source/`；与 [技能仓库目录](SKILLS.md) 的 12 个项目技能一致。CLI `skills list` 实际只显示三个公开内置技能：`migrate-to-recipkg`、`rewrite-to-recipkg`、`test-feedback`，不能把其他九个开发技能宣称为 CLI 内置。
+- **本地回归：** Linux / Python 3.14.10，使用仓库固定 CLI 源码执行 `RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -q`；58 项通过，零失败。未触发远程 CI 或 CodeQL。
+- **文档核对：** 扫描 Git 跟踪的所有 `.md` 文件中相对路径的内联 Markdown 链接，未发现缺失的目标文件；同时对照 `README.md`、`README.en.md` 的技能计数及开发命令。该扫描不证明外部 URL 可达、标题锚点有效或配方在语义上足够完整。
+- **未完成范围：** 本次没有执行 wheel 的隔离安装测试、跨平台原生验证、所有远端技能 HEAD 的兼容性检查或发布动作。2026-11-01 条目是当时证据快照，其 `11` 个技能数量和 Python 版本不应当作当前值。
+
+### Reproduction / 复现
+
+```sh
+git ls-files -s | grep '^160000 '
+PYTHONPATH=generated/cli-source/src python3 -m recipkg skills list
+RECIPKG_RECIPE_ROOT="$PWD" PYTHONPATH=generated/cli-source/src python3 -m unittest discover -s generated/cli-source/tests -q
+```
+
+**Claim–evidence review:** 本轮仅支持“12 个技能 gitlink 已记录、CLI 内置三个技能、现有 58 项本地测试通过、已检查的相对链接可解析”；不支持“12 个技能已全部运行验收”“wheel 已重新发布”“跨平台通过”或“完整语义复现”。后续改动应先固定上游源码及精确消费端，再补对应真实验证和提交回执。
+
 ## 2026-11-01：恢复进度与收尾
 
 ### 已确认的项目状态
